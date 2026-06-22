@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chainring Clearance Gauge Generator</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <aside id="controls">
+      <header>
+        <nav class="nav">
+          <a href="/index.html" class="active">Chainring gauge</a>
+          <a href="/seatpost-gauge.html">Seatpost gauge</a>
+        </nav>
+        <h1>Chainring Clearance Gauge</h1>
+        <p class="sub">Generate a 3D-printable gauge that traces the clearance swept by your
+          crankset, to check against a frame's drive-side chainstay.</p>
+      </header>
+
+      <div class="field">
+        <label for="preset">Crankset preset</label>
+        <select id="preset"></select>
+        <p class="hint" id="preset-note"></p>
+      </div>
+
+      <fieldset>
+        <legend>Chainrings</legend>
+        <div class="field">
+          <label for="rings">Rings</label>
+          <select id="rings">
+            <option value="1">1× (single)</option>
+            <option value="2">2× (double)</option>
+            <option value="3">3× (triple)</option>
+          </select>
+        </div>
+        <div class="field" id="teeth-fields">
+          <label>Teeth <span class="hint-inline">inner → outer</span></label>
+          <div id="teeth-inputs"></div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="chainline">Chainline (mm)<span class="q" title="Distance from the frame centerline (center of the seat tube / BB shell) to the center of the chainrings — the single ring (1×), the midpoint between rings (2×), or the middle ring (3×). Requires shell width; without it, measured from the drive face.">?</span></label>
+            <input type="number" id="chainline" step="0.5" value="43.5" />
+          </div>
+          <div class="field">
+            <label for="spacing">Ring spacing (mm)<span class="q" title="Axial distance between adjacent chainrings (used for 2× / 3×).">?</span></label>
+            <input type="number" id="spacing" step="0.5" value="8" />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Crank arm</legend>
+        <div class="row">
+          <div class="field">
+            <label for="crank">Crank length (mm)</label>
+            <input type="number" id="crank" step="2.5" value="172.5" />
+          </div>
+          <div class="field">
+            <label for="crank_offset">Crank offset (mm)<span class="q" title="How far outboard the crank arm sits beyond the outer ring.">?</span></label>
+            <input type="number" id="crank_offset" step="1" value="10" />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>BB shell registration</legend>
+        <div class="field">
+          <label for="shell_width">Shell width (mm)</label>
+          <select id="shell_width">
+            <option value="">None (no registration)</option>
+            <option value="68">68 — BSA road</option>
+            <option value="73">73 — MTB / wide</option>
+          </select>
+          <p class="hint">Adds a centering spigot + face flange so Z=0 lands on the drive face.</p>
+        </div>
+        <div class="row reg-only">
+          <div class="field">
+            <label for="spigot_dia">Spigot ⌀ (mm)<span class="q" title="Set to your shell's inner bore for a snug centering fit.">?</span></label>
+            <input type="number" id="spigot_dia" step="0.5" value="30" />
+          </div>
+          <div class="field">
+            <label for="face_dia">Face ⌀ (mm)<span class="q" title="Set ≥ your shell OD so the flange seats on the shell face.">?</span></label>
+            <input type="number" id="face_dia" step="0.5" value="42" />
+          </div>
+        </div>
+        <div class="field reg-only">
+          <label for="spigot_depth">Spigot depth (mm)<span class="q" title="How far the centering spigot reaches into the shell. A few mm is enough to center — it need not reach the shell centerline.">?</span></label>
+          <input type="number" id="spigot_depth" step="0.5" value="6" />
+        </div>
+      </fieldset>
+
+      <details id="advanced">
+        <summary>Advanced</summary>
+        <div class="field">
+          <label for="style">Style</label>
+          <select id="style">
+            <option value="arms">Arms — one rotatable fin per element</option>
+            <option value="disk">Disk — solid swept envelope</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="field"><label for="ring_thickness">Ring thickness (mm)</label><input type="number" id="ring_thickness" step="0.5" value="3" /></div>
+          <div class="field"><label for="fin_width">Fin width (mm)</label><input type="number" id="fin_width" step="1" value="15" /></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="crank_thickness">Crank thickness (mm)</label><input type="number" id="crank_thickness" step="1" value="6" /></div>
+          <div class="field"><label for="crank_width">Crank width (mm)</label><input type="number" id="crank_width" step="1" value="18" /></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="hub_radius">Hub radius (mm)</label><input type="number" id="hub_radius" step="0.5" value="12" /></div>
+          <div class="field"><label for="bore">Bore ⌀ (mm)<span class="q" title="Axial hole for an alignment rod. Larger = less filament. 0 = none.">?</span></label><input type="number" id="bore" step="0.5" value="20" /></div>
+        </div>
+        <div class="field"><label for="margin">Safety margin (mm)<span class="q" title="Inflates every radius for extra clearance.">?</span></label><input type="number" id="margin" step="0.5" value="0" /></div>
+        <div class="field check">
+          <label><input type="checkbox" id="lighten" checked /> Lightening holes in fins<span class="q" title="Cut evenly spaced windows in the ring/crank fins to save filament (arms style only).">?</span></label>
+        </div>
+      </details>
+
+      <div class="actions">
+        <button id="download" class="primary">Download STL</button>
+        <span id="status" class="status"></span>
+      </div>
+      <p class="disclaimer">Presets are industry-typical starting points — verify against your
+        actual crankset with calipers before trusting the gauge.</p>
+    </aside>
+
+    <main id="viewer">
+      <canvas id="scene"></canvas>
+      <div id="legend">
+        <span><i class="ax-z"></i> Z = BB axis (drive →)</span>
+        <span><i class="ax-x"></i> X = toward chainstay</span>
+      </div>
+      <div id="readout"></div>
+      <div id="sweep-control">
+        <label for="sweep">Sweep rotation about BB axis</label>
+        <input type="range" id="sweep" min="0" max="360" value="0" step="1" />
+        <span id="sweep-val">0°</span>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

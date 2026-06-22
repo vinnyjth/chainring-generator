@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Seatpost Size Gauge Generator</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📏</text></svg>" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+      "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.8/build/index.module.js",
+      "three-bvh-csg": "https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.16/build/index.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <aside id="controls">
+      <header>
+        <nav class="nav">
+          <a href="/index.html">Chainring gauge</a>
+          <a href="/seatpost-gauge.html" class="active">Seatpost gauge</a>
+        </nav>
+        <h1>Seatpost Size Gauge</h1>
+        <p class="sub">Generate a 3D-printable gauge to identify a seatpost / seat-tube diameter.
+          Choose a stacked <b>bike tower</b> or a <b>flat hole card</b> — each size is printed on
+          the part. Tuned for the Bambu Lab P1S build volume.</p>
+      </header>
+
+      <div class="field">
+        <label for="mode">Gauge type</label>
+        <select id="mode">
+          <option value="tower">Bike — stacked tower of rings</option>
+          <option value="plate">Flat — labelled hole card</option>
+        </select>
+        <p class="hint" id="mode-note">
+          Tower: drop a post into the funnel; the smallest ring it passes is its size.
+          Splits into telescoping segments if taller than the printer.
+        </p>
+      </div>
+
+      <fieldset>
+        <legend>Sizes</legend>
+        <div class="field">
+          <label for="preset">Preset set</label>
+          <select id="preset"></select>
+          <p class="hint" id="preset-note"></p>
+        </div>
+        <div class="field">
+          <label for="sizes">Diameters (mm)<span class="q" title="Comma or space separated. Duplicates are removed and the list is sorted automatically.">?</span></label>
+          <textarea id="sizes" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label for="clearance">Hole clearance (mm)<span class="q" title="Added to every labelled diameter. FDM holes print undersize, so a small positive value (≈0.2 mm) makes the real opening match the printed number. Set 0 for a tight reference fit.">?</span></label>
+          <input type="number" id="clearance" step="0.05" value="0.2" />
+        </div>
+      </fieldset>
+
+      <fieldset id="tower-fields">
+        <legend>Tower</legend>
+        <div class="row">
+          <div class="field"><label for="ring_height">Ring height (mm)</label><input type="number" id="ring_height" step="1" value="12" /></div>
+          <div class="field"><label for="wall">Wall (mm)<span class="q" title="Radial wall thickness of each ring (and the spacing between holes on the flat card).">?</span></label><input type="number" id="wall" step="0.5" value="3" /></div>
+        </div>
+        <div class="field"><label for="label_size">Label size (mm)<span class="q" title="Height of the raised printed digits.">?</span></label><input type="number" id="label_size" step="0.5" value="5" /></div>
+      </fieldset>
+
+      <fieldset id="plate-fields" class="hidden">
+        <legend>Flat card</legend>
+        <div class="row">
+          <div class="field"><label for="plate_thickness">Thickness (mm)</label><input type="number" id="plate_thickness" step="0.5" value="6" /></div>
+          <div class="field"><label for="plate_pad">Hole padding (mm)<span class="q" title="Gap around each hole inside its cell.">?</span></label><input type="number" id="plate_pad" step="0.5" value="6" /></div>
+        </div>
+      </fieldset>
+
+      <details id="advanced">
+        <summary>Printer</summary>
+        <div class="row">
+          <div class="field"><label for="max_z">Max height (mm)<span class="q" title="Usable Z. P1S is 256 mm; leave headroom for the part to seat. Towers taller than this split into segments.">?</span></label><input type="number" id="max_z" step="5" value="250" /></div>
+          <div class="field"><label for="max_bed">Max bed (mm)<span class="q" title="Usable bed X/Y. P1S is 256 mm.">?</span></label><input type="number" id="max_bed" step="5" value="250" /></div>
+        </div>
+        <p class="hint">Defaults are the Bambu Lab P1S (256 × 256 × 256 mm) with a small safety margin.</p>
+      </details>
+
+      <div class="actions">
+        <button id="download" class="primary">Download STL</button>
+        <span id="status" class="status"></span>
+      </div>
+      <p class="disclaimer">Sizes are industry-typical. FDM prints holes slightly undersize — tune
+        the clearance and verify against a known post with calipers before trusting the gauge.</p>
+    </aside>
+
+    <main id="viewer">
+      <canvas id="scene"></canvas>
+      <div id="readout"></div>
+    </main>
+  </div>
+  <script type="module" src="/seatpost-gauge.js"></script>
+</body>
+</html>
