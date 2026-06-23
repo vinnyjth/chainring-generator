@@ -100,14 +100,15 @@ seatpost sizes (editable, with presets) and is tuned for the **Bambu Lab P1S** b
 
 ![Seatpost tower](screenshots/seatpost-tower.png)
 
-A vertical funnel of rings, smallest bore at the bottom, each engraved with its size. Drop a
-post in from the top; it descends until it reaches a ring too small to pass — the smallest ring
-it cleared is its size.
+A vertical stack of rings, smallest at the bottom, **each ring's outer diameter equal to its
+labelled size** (so the "25.4" ring really is Ø25.4 mm). It's a plug gauge: insert the small end
+into the bike's seat tube and the largest ring that slides in is your seatpost size — you can
+size a frame without even having a post. The rings are hollow only to save plastic.
 
 If the tower is taller than the printer's Z, it **splits into interconnecting segments** that
 telescope together: each upper segment carries a `skirt` that slips over the ring below it, plus
 a solid `cap` the rings above sit on. The rings and the coupler are revolved tubes
-(`LatheGeometry`), so the bore stays clear.
+(`LatheGeometry`).
 
 ### Flat — labelled hole card
 
@@ -132,9 +133,9 @@ skipped gracefully (the part still prints, just without numbers).
 |---|---|---|
 | gauge type | tower | `tower` (stacked rings) or `plate` (flat hole card) |
 | sizes | common set | comma/space separated mm; deduped & sorted. Presets: common / modern / legacy / full range |
-| hole clearance | 0.2 | mm added to every labelled diameter — FDM holes print undersize, so a small positive value makes the real opening match the printed number. `0` = tight reference fit |
+| slip clearance | 0.2 | slip room. Tower: removed from each ring's outer ⌀ so it slides into a nominal seat tube. Card: added to each hole so a nominal post passes through. FDM prints outsides oversize / holes undersize, so ≈0.2 mm makes the labelled size accurate. `0` = exact reference |
 | ring height | 12 | mm tall per ring (tower) |
-| wall | 3 | mm radial ring wall (tower) / spacing between holes & to the edge (plate) |
+| wall | 3 | mm radial ring wall, hollowing the bore (tower) / spacing between holes & to the edge (plate) |
 | label size | 5 | mm height of the engraved digits |
 | plate thickness | 6 | mm (plate) |
 | hole padding | 6 | mm gap around each hole in its cell (plate) |

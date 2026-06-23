@@ -38,8 +38,9 @@
           <option value="plate">Flat — labelled hole card</option>
         </select>
         <p class="hint" id="mode-note">
-          Tower: drop a post into the funnel; the smallest ring it passes is its size.
-          Splits into telescoping segments if taller than the printer.
+          Tower: each ring's outer ⌀ is its labelled size — insert the small end into the seat
+          tube; the largest ring that slides in is your size. Splits into telescoping segments
+          if taller than the printer.
         </p>
       </div>
 
@@ -55,7 +56,7 @@
           <textarea id="sizes" rows="3"></textarea>
         </div>
         <div class="field">
-          <label for="clearance">Hole clearance (mm)<span class="q" title="Added to every labelled diameter. FDM holes print undersize, so a small positive value (≈0.2 mm) makes the real opening match the printed number. Set 0 for a tight reference fit.">?</span></label>
+          <label for="clearance">Slip clearance (mm)<span class="q" title="Slip room for a real-world fit. Tower: removed from each ring's outer ⌀ so it slides into a nominal seat tube. Card: added to each hole so a nominal post passes through. FDM prints outsides oversize and holes undersize, so ≈0.2 mm makes the labelled size accurate. Set 0 for an exact reference.">?</span></label>
           <input type="number" id="clearance" step="0.05" value="0.2" />
         </div>
       </fieldset>

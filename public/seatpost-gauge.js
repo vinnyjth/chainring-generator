@@ -85,8 +85,8 @@ $("sizes").addEventListener("input", () => {
 });
 
 const MODE_NOTES = {
-  tower: "Drop a post into the funnel; the smallest ring it passes is its size. Splits into telescoping segments if taller than the printer.",
-  plate: "Slide a post through the holes; the smallest one it fits is its size. Lays out as a single flat card sized to the bed.",
+  tower: "Each ring's OUTER ⌀ is its labelled size. Insert the small end into the bike's seat tube; the largest ring that slides in is your seatpost size. Splits into telescoping segments if taller than the printer.",
+  plate: "Slide a loose post through the holes; the smallest one it fits is its size. Lays out as a single flat card sized to the bed.",
 };
 function syncModeUI() {
   const mode = $("mode").value;
@@ -203,7 +203,7 @@ function makeText(str, size, depth) {
 // reading tangentially. The flat text plane sits proud of the curved surface by
 // the chord sagitta, so the cutter is sunk an extra `sagitta` to guarantee the
 // number's outer edges still break the surface (and we leave wall behind it).
-function ringTextCutter(str, ringOD, midZ, size) {
+function ringTextCutter(str, ringOD, midZ, size, minInnerR) {
   const g = makeText(str, size, 4);          // 4 mm radial reach (plenty)
   if (!g) return null;
   g.rotateX(Math.PI / 2);
@@ -213,7 +213,8 @@ function ringTextCutter(str, ringOD, midZ, size) {
   const width = b.max.y - b.min.y;
   const R = ringOD / 2;
   const sagitta = R - Math.sqrt(Math.max(0, R * R - (width / 2) * (width / 2)));
-  const innerX = R - (ENGRAVE + sagitta);     // deepest cut face
+  let innerX = R - (ENGRAVE + sagitta);       // deepest cut face
+  if (minInnerR != null) innerX = Math.max(innerX, minInnerR); // never breach the bore
   g.translate(innerX - b.min.x, -(b.min.y + b.max.y) / 2, midZ - (b.min.z + b.max.z) / 2);
   return g;
 }
@@ -276,8 +277,11 @@ function buildTower(p) {
   const maxZ = Math.max(ringH + JOINT_H + CAP_T, p.max_z);
   const chunks = chunkSizes(sorted, ringH, maxZ);
 
-  const od = (s) => s + p.clearance + 2 * wall;        // ring outer diameter
-  const id = (s) => s + p.clearance;                   // ring bore (= labelled size)
+  // The labelled size IS each ring's OUTER diameter — the tower is a plug gauge
+  // you insert into the frame's seat tube. `clearance` is slip room removed from
+  // the OD so a ring slides into a nominal-size tube. The bore just hollows it.
+  const od = (s) => s - p.clearance;                   // outer ⌀ = labelled size
+  const id = (s) => Math.max(4, od(s) - 2 * wall);     // bore ⌀ (keep ≥ 4 mm)
   const globalMaxOD = Math.max(...sorted.map(od)) + 2 * SKIRT_WALL;
   const gap = 14;
   const pitch = globalMaxOD + gap;
@@ -305,7 +309,7 @@ function buildTower(p) {
       const z1 = z0 + ringH;
       // build ring centered, engrave the label into its outer face, then offset
       const ring = tubeZ(id(s) / 2, od(s) / 2, z0, z1);
-      const cutter = ringTextCutter(s.toFixed(1), od(s), (z0 + z1) / 2, p.label_size);
+      const cutter = ringTextCutter(s.toFixed(1), od(s), (z0 + z1) / 2, p.label_size, id(s) / 2 + 0.6);
       const g = engrave(ring, cutter);
       if (xc) g.translate(xc, 0, 0);
       pushGeom(g);
@@ -325,7 +329,7 @@ function buildTower(p) {
       <caption>Tower — ${sorted.length} sizes</caption>
       ${rows}
       <tr class="total"><th>segments</th><td colspan="2">${n}${n > 1 ? " (telescope together)" : ""}</td></tr>
-      <tr><th>max ⌀</th><td colspan="2">${globalMaxOD.toFixed(1)} mm</td></tr>
+      <tr><th>ring ⌀</th><td colspan="2">${od(sorted[0]).toFixed(1)}–${od(sorted[sorted.length - 1]).toFixed(1)} mm</td></tr>
       <tr><th>tallest</th><td colspan="2">${Math.max(...heights).toFixed(0)} / ${p.max_z} mm</td></tr>
       ${overTall ? `<tr><td colspan="3" class="warn">⚠ a segment exceeds max height</td></tr>` : ""}
     </table>`;
