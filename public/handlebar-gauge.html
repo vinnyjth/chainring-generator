@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Handlebar / Clamp Diameter Gauge Generator</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📏</text></svg>" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+      "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.8/build/index.module.js",
+      "three-bvh-csg": "https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.16/build/index.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <aside id="controls">
+      <header>
+        <nav class="nav">
+          <a href="/index.html">Chainring</a>
+          <a href="/seatpost-gauge.html">Seatpost</a>
+          <a href="/handlebar-gauge.html" class="active">Bar clamp</a>
+          <a href="/ball-gauge.html">Bearings</a>
+          <a href="/pedal-gauge.html">Pedal</a>
+        </nav>
+        <h1>Handlebar / Clamp Diameter Gauge</h1>
+        <p class="sub">Generate a 3D-printable <b>saddle gauge</b> to identify the clamp diameter of
+          a handlebar, stem, or seat collar. Each labelled notch cradles one diameter — lay the round
+          tube in the notches; the one it nests into without rocking is its size.</p>
+      </header>
+
+      <fieldset>
+        <legend>Sizes</legend>
+        <div class="field">
+          <label for="preset">Preset set</label>
+          <select id="preset"></select>
+          <p class="hint" id="preset-note"></p>
+        </div>
+        <div class="field">
+          <label for="sizes">Diameters (mm)<span class="q" title="Comma or space separated. Duplicates are removed and the list is sorted automatically. Notches alternate between the two long edges to keep the bar short.">?</span></label>
+          <textarea id="sizes" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label for="clearance">Notch clearance (mm)<span class="q" title="Added to each notch radius. 0 = the notch arc exactly matches the labelled diameter (tightest read). A small positive value (≈0.1–0.2) eases FDM's slightly tight concave curves. Verify against a known bar with calipers.">?</span></label>
+          <input type="number" id="clearance" step="0.05" value="0.1" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Bar</legend>
+        <div class="row">
+          <div class="field"><label for="thickness">Thickness (mm)<span class="q" title="How deep the bar is through Z — i.e. how long each notch cradle is along the tube.">?</span></label><input type="number" id="thickness" step="0.5" value="8" /></div>
+          <div class="field"><label for="wall">Notch gap (mm)<span class="q" title="Material left between adjacent notches.">?</span></label><input type="number" id="wall" step="0.5" value="6" /></div>
+        </div>
+        <div class="field"><label for="label_size">Label size (mm)<span class="q" title="Height of the debossed printed digits.">?</span></label><input type="number" id="label_size" step="0.5" value="5" /></div>
+      </fieldset>
+
+      <details id="advanced">
+        <summary>Printer</summary>
+        <div class="field"><label for="max_bed">Max bed (mm)<span class="q" title="Usable bed X/Y. P1S is 256 mm.">?</span></label><input type="number" id="max_bed" step="5" value="250" /></div>
+        <p class="hint">Default is the Bambu Lab P1S (256 mm bed) with a small safety margin.</p>
+      </details>
+
+      <div class="actions">
+        <button id="download" class="primary">Download STL</button>
+        <span id="status" class="status"></span>
+      </div>
+      <p class="disclaimer">Sizes are industry-typical. A saddle notch reads curvature, not a tight
+        fit — the smallest notch the tube seats fully into (no rock) is its diameter. Verify against a
+        known bar with calipers before trusting the gauge.</p>
+    </aside>
+
+    <main id="viewer">
+      <canvas id="scene"></canvas>
+      <div id="readout"></div>
+    </main>
+  </div>
+  <script type="module" src="/handlebar-gauge.js"></script>
+</body>
+</html>

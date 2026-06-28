@@ -38,6 +38,7 @@ html, body {
 
 .nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   margin: 0 0 14px;
 }

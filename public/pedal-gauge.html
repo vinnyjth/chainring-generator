@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pedal Thread Gauge Generator</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦶</text></svg>" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+      "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.8/build/index.module.js",
+      "three-bvh-csg": "https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.16/build/index.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <aside id="controls">
+      <header>
+        <nav class="nav">
+          <a href="/index.html">Chainring</a>
+          <a href="/seatpost-gauge.html">Seatpost</a>
+          <a href="/handlebar-gauge.html">Bar clamp</a>
+          <a href="/ball-gauge.html">Bearings</a>
+          <a href="/pedal-gauge.html" class="active">Pedal</a>
+        </nav>
+        <h1>Pedal Thread Gauge</h1>
+        <p class="sub">Generate a 3D-printable <b>go / no-go card</b> to tell a <b>9⁄16″</b> pedal
+          (standard adult cranks) from a <b>1⁄2″</b> pedal (one-piece / BMX / kids cranks). Push the
+          pedal spindle through the holes — the smallest it passes is its thread size.</p>
+      </header>
+
+      <fieldset>
+        <legend>Sizes</legend>
+        <div class="field">
+          <label for="preset">Preset set</label>
+          <select id="preset"></select>
+          <p class="hint" id="preset-note"></p>
+        </div>
+        <div class="field">
+          <label for="sizes">Major diameters (mm)<span class="q" title="Thread major (crest) diameter. 1/2″-20 = 12.70 mm, 9/16″-20 = 14.29 mm. Both are 20 TPI, so diameter is the only thing that tells them apart. Editing switches to a custom set labelled in mm.">?</span></label>
+          <textarea id="sizes" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label for="clearance">Hole clearance (mm)<span class="q" title="Added to the major diameter so the thread crests clear the hole. Coarse threads + FDM undersizing want ≈0.3–0.5 mm. The two sizes are 1.6 mm apart, so there is plenty of margin to separate them.">?</span></label>
+          <input type="number" id="clearance" step="0.05" value="0.4" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Card</legend>
+        <div class="row">
+          <div class="field"><label for="thickness">Thickness (mm)<span class="q" title="Thick enough that a spindle must clear the full bore to count as passing.">?</span></label><input type="number" id="thickness" step="0.5" value="5" /></div>
+          <div class="field"><label for="pad">Hole padding (mm)<span class="q" title="Gap around each hole inside its cell.">?</span></label><input type="number" id="pad" step="0.5" value="7" /></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="wall">Edge wall (mm)</label><input type="number" id="wall" step="0.5" value="4" /></div>
+          <div class="field"><label for="label_size">Label size (mm)</label><input type="number" id="label_size" step="0.5" value="5" /></div>
+        </div>
+      </fieldset>
+
+      <details id="advanced">
+        <summary>Printer</summary>
+        <div class="field"><label for="max_bed">Max bed (mm)<span class="q" title="Usable bed X/Y. P1S is 256 mm.">?</span></label><input type="number" id="max_bed" step="5" value="250" /></div>
+        <p class="hint">Default is the Bambu Lab P1S (256 mm bed) with a small safety margin.</p>
+      </details>
+
+      <div class="actions">
+        <button id="download" class="primary">Download STL</button>
+        <span id="status" class="status"></span>
+      </div>
+      <p class="disclaimer">Both common pedal threads are 20 TPI — only the diameter differs, so a
+        plain hole tells them apart. Left pedals are reverse-threaded but the same diameter. The rare
+        French 14×1.25 mm thread is too close to 9⁄16″ to separate here. Verify with calipers.</p>
+    </aside>
+
+    <main id="viewer">
+      <canvas id="scene"></canvas>
+      <div id="readout"></div>
+    </main>
+  </div>
+  <script type="module" src="/pedal-gauge.js"></script>
+</body>
+</html>
