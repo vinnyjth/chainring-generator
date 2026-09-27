@@ -175,30 +175,32 @@ table.sheet tfoot td{font-weight:600;border-top:1.5px solid var(--ink);border-bo
       <section class="card">
         <h2><span class="n">2</span> Deck</h2>
         <div class="field"><label for="style">Loop</label>
-          <select id="style" data-bind="style" data-kind="str"><option value="open">U-loop, open at rear + rear bar</option><option value="closed">Closed loop, joined at rear center</option></select></div>
+          <select id="style" data-bind="style" data-kind="str"><option value="u-rear">U-loop closed at the rear, bar across the front</option><option value="u-front">U-loop closed at the front, bar across the rear</option><option value="closed">Closed loop, joined at one end</option></select></div>
         <div class="field"><label for="L">Length <small>outside, front to rear</small></label><input type="number" id="L" step="any" min="0" data-bind="L" data-kind="len"></div>
         <div class="field"><label for="W">Width <small>outside, side to side</small></label><input type="number" id="W" step="any" min="0" data-bind="W" data-kind="len"></div>
-        <div class="field"><label for="lipA">Front lip angle <small>0 for a flat deck, 90 for an upright lip</small></label><input type="number" id="lipA" step="1" min="0" max="120" data-bind="lipA" data-kind="num"></div>
-        <div class="field"><label for="lipH">Lip rise <small>front rail centerline above the deck</small></label><input type="number" id="lipH" step="any" min="0" data-bind="lipH" data-kind="len"></div>
-        <p class="hint">The loop is one tube. Corners use the deck die. A lip adds a bend up on each side rail and a 90° rotation before the corner.</p>
+        <div class="field" id="f-lipEnd"><label for="lipEnd">Lip end</label>
+          <select id="lipEnd" data-bind="lipEnd" data-kind="str"><option value="rear">Rear (backstop)</option><option value="front">Front</option></select></div>
+        <div class="field"><label for="lipA">Lip angle <small>0 for a flat deck, 90 for an upright lip</small></label><input type="number" id="lipA" step="1" min="0" max="120" data-bind="lipA" data-kind="num"></div>
+        <div class="field"><label for="lipH">Lip rise <small>lip rail centerline above the deck</small></label><input type="number" id="lipH" step="any" min="0" data-bind="lipH" data-kind="len"></div>
+        <p class="hint" id="lip-hint">The loop is one tube. Corners use the deck die. A lip goes on the closed end of a U-loop: it adds a bend up on each side rail and a 90° rotation before the corner.</p>
       </section>
 
       <section class="card">
         <h2><span class="n">3</span> Legs</h2>
         <div class="field"><label for="legH">Deck height <small>deck centerline above the eyelet</small></label><input type="number" id="legH" step="any" min="0" data-bind="legH" data-kind="len"></div>
         <div class="field"><label for="eyelet">Eyelet spacing <small>center to center across the bike</small></label><input type="number" id="eyelet" step="any" min="0" data-bind="eyelet" data-kind="len"></div>
-        <div class="field"><label for="legPos">Leg position <small>from the rear of the deck</small></label><input type="number" id="legPos" step="any" min="0" data-bind="legPos" data-kind="len"></div>
-        <div class="field"><label for="legRake">Rake <small>eyelet forward (+) or behind (−) the leg top</small></label><input type="number" id="legRake" step="any" data-bind="legRake" data-kind="len"></div>
+        <div class="field"><label for="legPos">Leg position <small>from the front of the deck</small></label><input type="number" id="legPos" step="any" min="0" data-bind="legPos" data-kind="len"></div>
+        <div class="field"><label for="legRake">Rake <small>eyelet behind (+) or ahead of (−) the leg top</small></label><input type="number" id="legRake" step="any" data-bind="legRake" data-kind="len"></div>
         <div class="field"><label for="legTop">Leg top</label>
           <select id="legTop" data-bind="legTop" data-kind="str"><option value="bent">Bent, lapped under the side rail</option><option value="straight">Straight strut, coped to the rail</option></select></div>
-        <div class="field" id="f-overlap"><label for="overlap">Lap length <small>straight run under the rail</small></label><input type="number" id="overlap" step="any" min="0" data-bind="overlap" data-kind="len"></div>
+        <div class="field" id="f-overlap"><label for="overlap">Lap length <small>straight run back under the rail</small></label><input type="number" id="overlap" step="any" min="0" data-bind="overlap" data-kind="len"></div>
       </section>
 
       <section class="card">
         <h2><span class="n">4</span> Stays</h2>
         <div class="field"><label for="stayMode">Stays</label>
           <select id="stayMode" data-bind="stayMode" data-kind="str"><option value="none">None</option><option value="sides">Two, from the side rails</option><option value="front">One, from the front rail center</option><option value="rear">One, from the rear center</option></select></div>
-        <div class="field" id="f-stayPos"><label for="stayPos">Attach point <small>from the rear of the deck</small></label><input type="number" id="stayPos" step="any" min="0" data-bind="stayPos" data-kind="len"></div>
+        <div class="field" id="f-stayPos"><label for="stayPos">Attach point <small>from the front of the deck</small></label><input type="number" id="stayPos" step="any" min="0" data-bind="stayPos" data-kind="len"></div>
         <div class="field" id="f-stayFx"><label for="stayFx">Mount offset <small>forward (+) or behind (−) the attach point</small></label><input type="number" id="stayFx" step="any" data-bind="stayFx" data-kind="len"></div>
         <div class="field" id="f-stayDrop"><label for="stayDrop">Mount drop <small>below the deck centerline</small></label><input type="number" id="stayDrop" step="any" data-bind="stayDrop" data-kind="len"></div>
         <div class="field" id="f-staySpacing"><label for="staySpacing">Mount spacing <small>center to center</small></label><input type="number" id="staySpacing" step="any" min="0" data-bind="staySpacing" data-kind="len"></div>
@@ -262,7 +264,8 @@ table.sheet tfoot td{font-weight:600;border-top:1.5px solid var(--ink);border-bo
       <div class="panel notes">
         <h3 style="color:var(--ink);margin-bottom:6px">Reading the sheets</h3>
         <ul>
-          <li><b>End A on the deck loop</b> is the rear end of the left side rail (or the rear-center joint on a closed loop). On a leg it is the eyelet end. The drawing puts the bike's front on the right.</li>
+          <li><b>End A on the deck loop</b> is the open end of the left side rail, so the front end when the loop is closed at the rear (or the joint on a closed loop). On a leg it is the eyelet end. The drawing puts the bike's front on the right.</li>
+          <li><b>Legs</b> start at the dropout eyelet, run up and forward to the front of the deck, bend, and lap back along the side rail. The eyelet sits behind the leg top so the deck, leg, and stay form a triangle.</li>
           <li><b>Marks are tangent points.</b> The tube starts curving at the start mark and is straight again at the end mark. Arc length is CLR × angle in radians and is already in the cut length.</li>
           <li><b>Rotation</b> is measured looking down the tube from end A toward the bender, clockwise positive, relative to the plane of the previous bend. A 0 means the same plane, 180 means the opposite way in the same plane. Check the sign on your first lipped deck; benders differ in which way they read it.</li>
           <li><b>Springback</b> is set on the bender, not on the marks. Thin-wall CrMo in a hand bender usually needs 2° to 4°.</li>
@@ -300,21 +303,21 @@ const DEFAULTS={
   deck:{tube:'c375-028', od:0.375, wall:0.028, clr:0.9375},
   leg:{tube:'c375-028', od:0.375, wall:0.028, clr:0.9375},
   slat:{tube:'c250-028', od:0.25, wall:0.028},
-  style:'open', L:12, W:5, lipA:0, lipH:1,
-  legH:9.5, eyelet:5.5, legPos:1.5, legRake:0, legTop:'bent', overlap:2,
-  stayMode:'sides', stayPos:9, stayFx:1.5, stayDrop:5, staySpacing:4.5,
+  style:'u-rear', lipEnd:'rear', L:12, W:5, lipA:0, lipH:2,
+  legH:9.5, eyelet:5.5, legPos:0.5, legRake:2.5, legTop:'bent', overlap:3,
+  stayMode:'sides', stayPos:0.5, stayFx:1.5, stayDrop:5, staySpacing:4.5,
   slatN:3, slatDir:'across', slatPrep:'cope',
   customOn:false, custom:[{s:6,a:90,rot:0},{s:10,a:90,rot:0},{s:6,a:0,rot:0}],
   offset:0, overbend:3, extra:0.75, tab:0.4,
 };
 const RACK_PRESETS={
-  rear:   {style:'open', L:12, W:5,  lipA:0,  lipH:1,    legH:9.5, eyelet:5.5,  legPos:1.5, legRake:0, legTop:'bent', overlap:2, stayMode:'sides', stayPos:9,  stayFx:1.5, stayDrop:5,  staySpacing:4.5, slatN:3, slatDir:'across'},
-  porteur:{style:'open', L:13, W:12, lipA:90, lipH:1.25, legH:7,   eyelet:4.25, legPos:2,   legRake:0, legTop:'bent', overlap:2, stayMode:'rear',  stayPos:0,  stayFx:-2,  stayDrop:3.5, staySpacing:0,  slatN:3, slatDir:'along'},
-  rando:  {style:'open', L:8,  W:8,  lipA:90, lipH:1,    legH:6,   eyelet:4.25, legPos:1.5, legRake:0, legTop:'bent', overlap:1.5, stayMode:'rear', stayPos:0, stayFx:-1.5, stayDrop:3, staySpacing:0,  slatN:2, slatDir:'across'},
+  rear:   {style:'u-rear', lipEnd:'rear', L:12, W:5,  lipA:0,  lipH:1,    legH:9.5, eyelet:5.5,  legPos:0.5, legRake:2.5, legTop:'bent', overlap:3, stayMode:'sides', stayPos:0.5, stayFx:1.5, stayDrop:5,  staySpacing:4.5, slatN:3, slatDir:'across'},
+  porteur:{style:'u-rear', lipEnd:'rear', L:13, W:12, lipA:90, lipH:2.25, legH:7,   eyelet:4.25, legPos:0.5, legRake:5,   legTop:'bent', overlap:3, stayMode:'rear',  stayPos:0.5, stayFx:0,   stayDrop:3,  staySpacing:0,   slatN:3, slatDir:'along'},
+  rando:  {style:'u-rear', lipEnd:'rear', L:8,  W:8,  lipA:90, lipH:2,    legH:6,   eyelet:4.25, legPos:0.5, legRake:3,   legTop:'bent', overlap:2, stayMode:'rear',  stayPos:0.5, stayFx:0,   stayDrop:2.5, staySpacing:0,  slatN:2, slatDir:'across'},
 };
 let S=JSON.parse(JSON.stringify(DEFAULTS));
-try{ const saved=JSON.parse(localStorage.getItem('brb2-state')||'null'); if(saved&&typeof saved==='object'){ S=Object.assign(S,saved); ['deck','leg','slat'].forEach(k=>S[k]=Object.assign({},DEFAULTS[k],saved[k]||{})); } }catch(e){}
-function save(){ try{ localStorage.setItem('brb2-state',JSON.stringify(S)); }catch(e){} }
+try{ const saved=JSON.parse(localStorage.getItem('brb3-state')||'null'); if(saved&&typeof saved==='object'){ S=Object.assign(S,saved); ['deck','leg','slat'].forEach(k=>S[k]=Object.assign({},DEFAULTS[k],saved[k]||{})); if(!['u-rear','u-front','closed'].includes(S.style)) S.style='u-rear'; } }catch(e){}
+function save(){ try{ localStorage.setItem('brb3-state',JSON.stringify(S)); }catch(e){} }
 
 const $=id=>document.getElementById(id);
 const toDisp=v=>S.unit==='mm'?v*IN:v, fromDisp=v=>S.unit==='mm'?v/IN:v;
@@ -398,65 +401,75 @@ function build(){
     if(s<0) errs.push(`Lip rise ${fmt(S.lipH)} is too small for a ${S.lipA}° lip on a ${fmt(R)} die. Minimum is ${fmt(R*(1-Math.cos(a))+R*Math.sin(a))}.`); }
   const front=Wc-2*R;
   if(front<0) errs.push(`Deck width ${fmt(S.W)} is too narrow for two corners on a ${fmt(R)} die. Minimum ${fmt(2*R+d)}.`);
-  const sideStraight = S.style==='open' ? Lc-lipX : Lc-R-lipX;
+  const isOpen=S.style!=='closed';
+  // lipEnd: which end of the deck carries the closed (and possibly lipped) rail. Open loops put it on the closed end.
+  const lipEnd = S.style==='u-rear' ? 'rear' : S.style==='u-front' ? 'front' : (S.lipEnd==='front'?'front':'rear');
+  const f = lipEnd==='front' ? 1 : -1;                 // direction along the rails from the open/joint end toward the lip end
+  const u2x = u => f>0 ? u : Lc-u;                      // local u (0 at open end) -> world x (0 at rear, front at +x)
+  const sideStraight = isOpen ? Lc-lipX : Lc-R-lipX;
   if(sideStraight<0) errs.push(`Deck length ${fmt(S.L)} is too short for the corners${hasLip?' and lip':''}. Side rails come out ${fmt(sideStraight)}.`);
-  const lipFrontZ = hasLip?S.lipH:0;
-  const lipStartX = S.style==='open' ? sideStraight : R+sideStraight; // x where the side rail ends (lip bend start or corner start)
+  const uRail0 = isOpen ? 0 : R, uRail1 = uRail0+sideStraight;   // straight side-rail span in local u
+  const railX = [u2x(uRail0),u2x(uRail1)].sort((p,q)=>p-q);       // same span in world x
+  const lipZ = hasLip?S.lipH:0;
+  const endZ = {rear: lipEnd==='rear'?lipZ:0, front: lipEnd==='front'?lipZ:0};
 
-  // deck loop
+  // deck loop, traced from the open (or joint) end, heading toward the lip end
   const segs=[];
-  const leftSide=()=>{ segs.push({s:sideStraight}); if(hasLip){ segs.push({bend:{R,to:[Math.cos(a),0,Math.sin(a)]}}); segs.push({s}); } segs.push({bend:{R,to:[0,-1,0]}}); };
-  const rightSide=()=>{ if(hasLip){ segs.push({bend:{R,to:[-Math.cos(a),0,-Math.sin(a)]}}); segs.push({s}); segs.push({bend:{R,to:[-1,0,0]}}); } else segs.push({bend:{R,to:[-1,0,0]}}); segs.push({s:sideStraight}); };
+  const leftSide=()=>{ segs.push({s:sideStraight}); if(hasLip){ segs.push({bend:{R,to:[f*Math.cos(a),0,Math.sin(a)]}}); segs.push({s}); } segs.push({bend:{R,to:[0,-1,0]}}); };
+  const rightSide=()=>{ if(hasLip){ segs.push({bend:{R,to:[-f*Math.cos(a),0,-Math.sin(a)]}}); segs.push({s}); segs.push({bend:{R,to:[-f,0,0]}}); } else segs.push({bend:{R,to:[-f,0,0]}}); segs.push({s:sideStraight}); };
   let deck;
-  if(S.style==='open'){
+  if(isOpen){
     leftSide(); segs.push({s:front}); rightSide();
-    deck={name:'Deck loop',od:d,start:[0,Wc/2,0],h:[1,0,0],segs,X0:X,X1:X,role:'deck',tube:'deck'};
+    deck={name:'Deck loop',od:d,start:[u2x(0),Wc/2,0],h:[f,0,0],segs,X0:X,X1:X,role:'deck',tube:'deck'};
   } else {
-    segs.push({s:Wc/2-R}); segs.push({bend:{R,to:[1,0,0]}}); leftSide(); segs.push({s:front}); rightSide(); segs.push({bend:{R,to:[0,1,0]}}); segs.push({s:Wc/2-R});
-    deck={name:'Deck loop',od:d,start:[0,0,0],h:[0,1,0],segs,X0:X,X1:X,role:'deck',tube:'deck'};
-    if(Wc/2-R<0) errs.push('Deck width is too narrow for the rear corners.');
+    segs.push({s:Wc/2-R}); segs.push({bend:{R,to:[f,0,0]}}); leftSide(); segs.push({s:front}); rightSide(); segs.push({bend:{R,to:[0,1,0]}}); segs.push({s:Wc/2-R});
+    deck={name:'Deck loop',od:d,start:[u2x(0),0,0],h:[0,1,0],segs,X0:X,X1:X,role:'deck',tube:'deck'};
+    if(Wc/2-R<0) errs.push('Deck width is too narrow for the corners at the joint end.');
   }
   deck.geo=trace(deck); deck.cut=deck.geo.total; deck.sheet=true; deck.weight=deck.cut*lbIn.deck;
-  deck.prep = S.style==='open' ? 'both ends square, brazed to the rear bar' : 'ends meet at the rear center, sleeve or butt braze';
+  const openName = lipEnd==='front' ? 'rear' : 'front';
+  deck.prep = isOpen ? `both ends square, brazed to the ${openName} bar` : `ends meet at the ${openName} center, sleeve or butt braze`;
   parts.push(deck);
-  if(S.style==='open'){
-    const gap=Wc-d, L2=S.slatPrep==='cope'?gap+2*saddle(d,d):gap;
-    parts.push({name:'Rear bar',od:d,role:'bar',tube:'deck',cut:L2,count:1,weight:L2*lbIn.deck,line:[[0,-gap/2,0],[0,gap/2,0]],prep:S.slatPrep==='cope'?`coped both ends, tip to tip`:'square cut, clear gap'});
+  if(isOpen){
+    const gap=Wc-d, L2=S.slatPrep==='cope'?gap+2*saddle(d,d):gap, bx=u2x(0);
+    parts.push({name:openName==='front'?'Front bar':'Rear bar',od:d,role:'bar',tube:'deck',cut:L2,count:1,weight:L2*lbIn.deck,line:[[bx,-gap/2,0],[bx,gap/2,0]],prep:S.slatPrep==='cope'?`coped both ends, tip to tip`:'square cut, clear gap'});
   }
   // legs
   const c=S.leg.od, Rl=S.leg.clr, tab=Math.max(0,S.tab);
   const legNote=[];
   [1,-1].forEach((sign,idx)=>{
-    const P=[S.legPos+S.legRake, sign*S.eyelet/2, -S.legH];
+    const topX=Lc-S.legPos;                                   // leg top, measured back from the front of the deck
+    const P=[topX-S.legRake, sign*S.eyelet/2, -S.legH];       // eyelet sits behind the leg top by the rake
     mounts.push({pt:P,r:c*0.35});
     if(S.legTop==='bent'){
-      const A=[S.legPos, sign*Wc/2, -(d+c)/2];
+      const A=[topX, sign*Wc/2, -(d+c)/2];                    // lap starts here and runs rearward
       let v=norm(sub(A,P)), beta=0, t=0, Vx=A;
-      for(let k=0;k<30;k++){ beta=Math.acos(clamp(v[0],-1,1)); t=Rl*Math.tan(beta/2); Vx=sub(A,[t,0,0]); v=norm(sub(Vx,P)); }
+      for(let k=0;k<30;k++){ beta=Math.acos(clamp(-v[0],-1,1)); t=Rl*Math.tan(beta/2); Vx=add(A,[t,0,0]); v=norm(sub(Vx,P)); }
       const legStraight=len(sub(Vx,P))-t;
-      const part={name:idx===0?'Leg (left)':'Leg (right)',od:c,tube:'leg',role:'leg',start:sub(P,mul(v,tab)),h:v,segs:[{s:tab+legStraight},{bend:{R:Rl,to:[1,0,0]}},{s:S.overlap}],X0:0,X1:X};
+      const part={name:idx===0?'Leg (left)':'Leg (right)',od:c,tube:'leg',role:'leg',start:sub(P,mul(v,tab)),h:v,segs:[{s:tab+legStraight},{bend:{R:Rl,to:[-1,0,0]}},{s:S.overlap}],X0:0,X1:X};
       part.geo=trace(part); part.cut=part.geo.total; part.weight=part.cut*lbIn.leg; part.sheet=idx===0;
-      part.prep=`eyelet end flattened and drilled ${fmt(tab)} from the tip; lap ${fmt(S.overlap)} under the rail`;
+      part.prep=`eyelet end flattened and drilled ${fmt(tab)} from the tip; lap ${fmt(S.overlap)} back under the rail`;
       if(legStraight<0) errs.push('Leg is too short to fit the bend. Raise the deck or move the eyelet.');
-      if(idx===0){ legNote.push(`Bend ${(beta*180/PI).toFixed(1)}° so the lap runs forward under the rail. Make the right leg as a mirror image.`);
-        if(S.legPos+S.overlap>lipStartX-1e-9) warns.push(`Leg lap runs ${fmt(S.legPos+S.overlap-lipStartX)} past the end of the straight side rail. Shorten the lap or move the legs back.`); }
+      if(idx===0){ legNote.push(`Bend ${(beta*180/PI).toFixed(1)}° so the lap runs back under the side rail. Make the right leg as a mirror image.`);
+        if(topX>railX[1]+1e-9) warns.push(`Leg top sits ${fmt(topX-railX[1])} into the front corner. Move the legs back to ${fmt(Lc-railX[1])} or more from the front.`);
+        else if(topX-S.overlap<railX[0]-1e-9) warns.push(`Leg lap runs ${fmt(railX[0]-(topX-S.overlap))} past the end of the straight side rail. Shorten the lap.`); }
       parts.push(part);
     } else {
-      const Q=[S.legPos, sign*Wc/2, 0];
+      const Q=[topX, sign*Wc/2, 0];
       const dist=len(sub(Q,P)), v=norm(sub(Q,P));
       const cut=tab+dist-(d/2-saddle(d,c));
       const part={name:idx===0?'Leg (left)':'Leg (right)',od:c,tube:'leg',role:'leg',cut,weight:cut*lbIn.leg,line:[sub(P,mul(v,tab)),Q],prep:`eyelet end flattened and drilled ${fmt(tab)} from the tip; top coped to the rail`};
       parts.push(part);
-      if(idx===0 && S.legPos>lipStartX) warns.push('Leg attaches beyond the straight side rail. Move the legs back.');
+      if(idx===0 && (topX>railX[1]||topX<railX[0])) warns.push('Leg attaches outside the straight side rail. Move the legs back.');
     }
   });
   // stays
   if(S.stayMode!=='none'){
     const list=[];
-    if(S.stayMode==='sides'){ [1,-1].forEach(sign=>list.push({Q:[S.stayPos,sign*Wc/2,0],M:[S.stayPos+S.stayFx,sign*S.staySpacing/2,-S.stayDrop]}));
-      if(S.stayPos>lipStartX) warns.push('Stays attach beyond the straight side rail. Move them back or shorten the deck lip.'); }
-    else if(S.stayMode==='front') list.push({Q:[Lc,0,lipFrontZ],M:[Lc+S.stayFx,0,lipFrontZ-S.stayDrop]});
-    else list.push({Q:[0,0,0],M:[S.stayFx,0,-S.stayDrop]});
+    if(S.stayMode==='sides'){ const sx=Lc-S.stayPos; [1,-1].forEach(sign=>list.push({Q:[sx,sign*Wc/2,0],M:[sx+S.stayFx,sign*S.staySpacing/2,-S.stayDrop]}));
+      if(sx>railX[1]||sx<railX[0]) warns.push('Stays attach outside the straight side rail. Move them back from the front corner.'); }
+    else if(S.stayMode==='front') list.push({Q:[Lc,0,endZ.front],M:[Lc+S.stayFx,0,endZ.front-S.stayDrop]});
+    else list.push({Q:[0,0,endZ.rear],M:[S.stayFx,0,endZ.rear-S.stayDrop]});
     list.forEach((st,i)=>{
       const dist=len(sub(st.M,st.Q)), v=norm(sub(st.Q,st.M));
       const cut=tab+dist-(d/2-saddle(d,c));
@@ -469,14 +482,15 @@ function build(){
   if(n>0){
     const sad=saddle(d,cs);
     if(S.slatDir==='across'){
-      const x0=d/2, x1=lipStartX-cs/2, gap=Wc-d, cut=S.slatPrep==='cope'?gap+2*sad:gap;
-      const lines=[]; for(let i=0;i<n;i++){ const x=x0+(x1-x0)*(i+1)/(n+1); lines.push([[x,-gap/2,0],[x,gap/2,0]]); }
+      const u0=(isOpen?d/2:R)+cs/2, u1=uRail1-cs/2, gap=Wc-d, cut=S.slatPrep==='cope'?gap+2*sad:gap;
+      const lines=[]; for(let i=0;i<n;i++){ const x=u2x(u0+(u1-u0)*(i+1)/(n+1)); lines.push([[x,-gap/2,0],[x,gap/2,0]]); }
       parts.push({name:'Deck slat',od:cs,tube:'slat',role:'slat',cut,count:n,weight:cut*lbIn.slat,lines,prep:S.slatPrep==='cope'?'coped both ends, tip to tip':'square cut, clear gap'});
-      if(x1<x0) errs.push('No straight deck left for cross slats.');
+      if(u1<u0) errs.push('No straight deck left for cross slats.');
     } else {
-      const xa=d/2, xb=hasLip?lipStartX:Lc-d/2, gap=xb-xa, cut=S.slatPrep==='cope'?gap+2*sad:gap;
+      const ua=d/2, ub=hasLip?uRail1:Lc-d/2, gap=ub-ua, cut=S.slatPrep==='cope'?gap+2*sad:gap;
+      const xa=u2x(ua), xb=u2x(ub);
       const lines=[]; for(let i=0;i<n;i++){ const y=-Wc/2+d/2+(Wc-d)*(i+1)/(n+1); lines.push([[xa,y,0],[xb,y,0]]); }
-      parts.push({name:'Deck slat',od:cs,tube:'slat',role:'slat',cut,count:n,weight:cut*lbIn.slat,lines,prep:(S.slatPrep==='cope'?'coped both ends, tip to tip':'square cut, clear gap')+(hasLip?'; front end meets the lip bend':'')});
+      parts.push({name:'Deck slat',od:cs,tube:'slat',role:'slat',cut,count:n,weight:cut*lbIn.slat,lines,prep:(S.slatPrep==='cope'?'coped both ends, tip to tip':'square cut, clear gap')+(hasLip?`; ${lipEnd} end meets the lip bend`:'')});
     }
   }
   // custom part
@@ -493,7 +507,7 @@ function build(){
   const bends=parts.reduce((k,p)=>k+(p.geo?p.geo.rows.filter(r=>r.type==='bend').length:0),0)+(custom?custom.geo.rows.filter(r=>r.type==='bend').length:0);
   const all=parts.concat(custom?[custom]:[]);
   const totalLen=all.reduce((k,p)=>k+p.cut*(p.count||1),0), weight=all.reduce((k,p)=>k+p.weight*(p.count||1),0);
-  return {parts,custom,mounts,errs,warns,legNote,bends,totalLen,weight,lbIn,dims:{Lc,Wc,d,lipFrontZ,hasLip,lipStartX}};
+  return {parts,custom,mounts,errs,warns,legNote,bends,totalLen,weight,lbIn,dims:{Lc,Wc,d,lipZ,lipEnd,hasLip,railX}};
 }
 
 /* ---------- drawing ---------- */
@@ -537,7 +551,7 @@ function drawView(container, items, mounts, dims, proj, label){
 }
 
 function renderDrawing(m){
-  const {Lc,Wc,d,lipFrontZ,hasLip}=m.dims;
+  const {Lc,Wc,d,lipZ,lipEnd,hasLip}=m.dims;
   const items=m.parts.map(p=>p.geo?{pts:p.geo.pts,ev:p.geo.ev,od:p.od,role:p.role,sheet:p.sheet}:p);
   const plan=p=>[p[0],-p[1]], side=p=>[p[0],-p[2]];
   const padL=d*1.6;
@@ -545,15 +559,19 @@ function renderDrawing(m){
     {a:[-d/2,-(Wc/2+d/2)-padL],b:[Lc+d/2,-(Wc/2+d/2)-padL],label:`${fmt(S.L)} long`},
     {a:[Lc+d/2+padL,-(Wc/2+d/2)],b:[Lc+d/2+padL,(Wc/2+d/2)],label:`${fmt(S.W)} wide`},
   ];
-  const ex=S.legPos+S.legRake;
+  const ex=Lc-S.legPos-S.legRake;
   const exd=Math.min(-d/2,ex)-padL*2.4;
   planDims.push({a:[exd,-S.eyelet/2],b:[exd,S.eyelet/2],label:`${fmt(S.eyelet)} eyelets`,left:true});
   drawView($('view-plan'),items,m.mounts,planDims,plan,'Plan view of the rack');
+  const rearX=Math.min(-d/2,ex)-padL*1.4;
   const sideDims=[
-    {a:[S.legPos+S.legRake-padL*2.2,S.legH],b:[S.legPos+S.legRake-padL*2.2,0],label:`${fmt(S.legH)} deck height`,left:true},
+    {a:[rearX,S.legH],b:[rearX,0],label:`${fmt(S.legH)} deck height`,left:true},
   ];
-  if(hasLip) sideDims.push({a:[Lc+d/2+padL,-lipFrontZ],b:[Lc+d/2+padL,0],label:`${fmt(S.lipH)} lip`});
-  if(S.stayMode!=='none') sideDims.push({a:[Lc+d/2+padL*(hasLip?2.4:1),S.stayDrop-(S.stayMode==='front'?lipFrontZ:0)],b:[Lc+d/2+padL*(hasLip?2.4:1),-(S.stayMode==='front'?lipFrontZ:0)],label:`${fmt(S.stayDrop)} stay drop`});
+  const lipFront=hasLip&&lipEnd==='front', lipRear=hasLip&&lipEnd==='rear';
+  if(lipRear) sideDims.push({a:[rearX-padL*2,-lipZ],b:[rearX-padL*2,0],label:`${fmt(S.lipH)} lip`,left:true});
+  if(lipFront) sideDims.push({a:[Lc+d/2+padL,-lipZ],b:[Lc+d/2+padL,0],label:`${fmt(S.lipH)} lip`});
+  if(S.stayMode!=='none'){ const z0=S.stayMode==='front'?(lipFront?lipZ:0):S.stayMode==='rear'?(lipRear?lipZ:0):0, sx=S.stayMode==='rear'?rearX-padL*(lipRear?4:2):Lc+d/2+padL*(lipFront?2.4:1);
+    sideDims.push({a:[sx,S.stayDrop-z0],b:[sx,-z0],label:`${fmt(S.stayDrop)} stay drop`,left:S.stayMode==='rear'}); }
   drawView($('view-side'),items,m.mounts,sideDims,side,'Side view of the rack');
   $('draw-sub').textContent=`${m.bends} bends · ${fmt(m.totalLen)} of tube · about ${wt(m.weight)} per rack`;
 }
@@ -629,7 +647,7 @@ function renderAlerts(m){ $('alerts').innerHTML=m.errs.map(e=>`<div class="alert
 function sheetText(m){
   const q=Math.max(1,Math.round(S.qty)), L=[];
   L.push(`BIKE RACK BEND SHEET · qty ${q} · ${MAT_NAME[S.material]}`);
-  L.push(`Deck ${fmt(S.L)} × ${fmt(S.W)}${m.dims.hasLip?` · ${S.lipA}° lip, rise ${fmt(S.lipH)}`:''} · deck height ${fmt(S.legH)} · eyelets ${fmt(S.eyelet)}`);
+  L.push(`Deck ${fmt(S.L)} × ${fmt(S.W)}${m.dims.hasLip?` · ${S.lipA}° ${m.dims.lipEnd} lip, rise ${fmt(S.lipH)}`:''} · deck height ${fmt(S.legH)} · eyelets ${fmt(S.eyelet)} · legs ${fmt(S.legPos)} from front, rake ${fmt(S.legRake)}`);
   L.push(`Deck tube ${tubeName('deck')} CLR ${fmt(S.deck.clr)} · legs ${tubeName('leg')} CLR ${fmt(S.leg.clr)} · slats ${tubeName('slat')} · overbend ${S.overbend}°`);
   const list=m.parts.filter(p=>p.sheet).concat(m.custom?[m.custom]:[]);
   list.forEach(p=>{ L.push(''); L.push(`${p.name.toUpperCase()} — cut ${fmt(p.geo.total)} (${dec(p.geo.total)})`);
@@ -651,6 +669,10 @@ function setInputs(){
   $('f-stayPos').hidden=S.stayMode!=='sides'; $('f-staySpacing').hidden=S.stayMode!=='sides';
   $('f-stayFx').hidden=S.stayMode==='none'; $('f-stayDrop').hidden=S.stayMode==='none';
   $('custom-wrap').hidden=!S.customOn;
+  $('f-lipEnd').hidden=S.style!=='closed';
+  $('lip-hint').textContent = S.style==='closed'
+    ? 'The loop is one tube, joined at the end opposite the lip. Corners use the deck die. A lip adds a bend up on each side rail and a 90° rotation before the corner.'
+    : `The loop is one tube. Corners use the deck die. A lip goes on the closed (${S.style==='u-rear'?'rear':'front'}) end: it adds a bend up on each side rail and a 90° rotation before the corner.`;
   renderCustomRows();
 }
 function renderCustomRows(){

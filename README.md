@@ -152,12 +152,14 @@ Bend sheets and a cut list for a **tube rack that mounts on the bike**. Pick the
 (1/4"–1/2" CrMo, 6–12 mm metric, solid rod, or custom) and your hand-bender die CLR, size the
 deck, drop the legs to the dropout eyelets, add stays and slats, and read the marks.
 
-- **Deck loop** — one continuous tube: a U open at the rear (plus a rear bar) or a closed loop
-  joined at rear center. An optional **front lip** bends each side rail up before the corner,
-  which adds a 90° rotation in the die, so sheets are distance / angle / rotation.
-- **Legs** — two, from the dropout eyelets to the side rails. Bent-and-lapped tops (the bend
-  angle is solved so the lap runs straight under the rail even with splay and rake) or
-  straight struts coped to the rail.
+- **Deck loop** — one continuous tube: a U closed at the rear (bar across the front), a U
+  closed at the front (bar across the rear), or a closed loop joined at one end. An optional
+  **lip** (a backstop, on the closed end; rear by default) bends each side rail up before the
+  corner, which adds a 90° rotation in the die, so sheets are distance / angle / rotation.
+- **Legs** — two, from the dropout eyelets up and forward to the front of the deck. The eyelet
+  sits behind the leg top (rake) so deck, leg, and stay triangulate. Bent-and-lapped tops
+  (the bend angle is solved so the lap runs straight back under the side rail even with splay
+  and rake) or straight struts coped to the rail.
 - **Stays** — none, a pair from the side rails, one from the front rail, or one from the rear
   center (fork crown). Lengths come from the mount offset and drop.
 - **Slats** — across or lengthwise, coped or square cut, evenly spaced on the straight deck.
@@ -169,8 +171,10 @@ before each bend. The cut list includes every piece with end prep (coped tip-to-
 flattened eyelet tabs) and a weight in grams. Units toggle between inches (to 1/32) and mm;
 inputs persist in `localStorage`.
 
-Conventions: end A of the deck loop is the rear end of the left side rail; front is to the
-right in both views; rotation is read clockwise looking down the tube from end A. Verify the
+Conventions: end A of the deck loop is the open end of the left side rail (the front end when
+the loop is closed at the rear); leg and stay positions are measured back from the front of the
+deck; front is to the right in both views; rotation is read clockwise looking down the tube
+from end A. Verify the
 rotation sign on a first lipped deck — benders differ.
 
 ---
