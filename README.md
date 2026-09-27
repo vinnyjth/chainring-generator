@@ -1,13 +1,15 @@
 # Bike Gauge Generators
 
 Browser apps that **live-preview** 3D-printable bicycle gauges and **download STLs** — no
-backend, no build step, everything runs client-side in three.js. Two tools share one static
+backend, no build step, everything runs client-side in three.js. The tools share one static
 site (top-nav switches between them):
 
 1. **Chainring clearance gauge** (`index.html`) — traces the clearance swept by a crankset's
    chainring(s) and crank arm, to check against a frame's drive-side chainstay.
 2. **Seatpost size gauge** (`seatpost-gauge.html`) — identifies a seatpost / seat-tube
    diameter, defaulted to a set of common seatpost sizes.
+3. **Rack bender** (`rack-bender.html`) — not a gauge: bend sheets and a cut list for a
+   tube rack that mounts on the bike (pannier, porteur, rando). Pure 2D/3D geometry, no three.js.
 
 **Live:** https://chainring-generator.vercel.app
 
@@ -144,6 +146,35 @@ skipped gracefully (the part still prints, just without numbers).
 
 ---
 
+## Rack bender
+
+Bend sheets and a cut list for a **tube rack that mounts on the bike**. Pick the tubing
+(1/4"–1/2" CrMo, 6–12 mm metric, solid rod, or custom) and your hand-bender die CLR, size the
+deck, drop the legs to the dropout eyelets, add stays and slats, and read the marks.
+
+- **Deck loop** — one continuous tube: a U open at the rear (plus a rear bar) or a closed loop
+  joined at rear center. An optional **front lip** bends each side rail up before the corner,
+  which adds a 90° rotation in the die, so sheets are distance / angle / rotation.
+- **Legs** — two, from the dropout eyelets to the side rails. Bent-and-lapped tops (the bend
+  angle is solved so the lap runs straight under the rail even with splay and rake) or
+  straight struts coped to the rail.
+- **Stays** — none, a pair from the side rails, one from the front rail, or one from the rear
+  center (fork crown). Lengths come from the mount offset and drop.
+- **Slats** — across or lengthwise, coped or square cut, evenly spaced on the straight deck.
+- **Extra part** — a free distance/angle/rotation list for pannier rails, light mounts, etc.
+
+Each bent part gets a straight-stick layout with tangent marks from both ends, a bender-mark
+column shifted by your bender's reference offset, the angle plus springback, and the rotation
+before each bend. The cut list includes every piece with end prep (coped tip-to-tip lengths,
+flattened eyelet tabs) and a weight in grams. Units toggle between inches (to 1/32) and mm;
+inputs persist in `localStorage`.
+
+Conventions: end A of the deck loop is the rear end of the left side rail; front is to the
+right in both views; rotation is read clockwise looking down the tube from end A. Verify the
+rotation sign on a first lipped deck — benders differ.
+
+---
+
 ## Develop locally
 
 It's static, so any file server works — e.g.:
@@ -171,6 +202,7 @@ public/seatpost-gauge.html     seatpost gauge UI
 public/styles.css              shared styles (nav, forms, viewer)
 public/app.js                  chainring: three.js preview + form + STL export
 public/seatpost-gauge.js       seatpost: three.js preview + form + CSG engraving + STL export
+public/rack-bender.html        rack bender: self-contained (styles + geometry + sheets inline)
 screenshots/                   README images
 chainring_clearance_gauge.py   original chainring reference (not used by the app)
 ```

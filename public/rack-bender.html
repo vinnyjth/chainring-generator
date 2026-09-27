@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bike Rack Bender</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0f1115; --panel:#171a21; --panel-2:#1f232c; --ink:#e6e9ef; --muted:#9aa3b2; --line:#2b313c; --line-2:#242933;
+  --steel:#8E99A5; --steel-edge:#C3CBD3; --center:#F0F3F6; --steel-2:#5F6973;
+  --accent:#ffb74f; --accent-soft:#3a2d14; --accent-ink:#1a1204;
+  --dim:#4f9dff; --ok:#6bd98a; --warn:#ffb74f; --warn-soft:#3a2d14; --bad:#ff6b6b; --bad-soft:#3e1d1a;
+  --focus:#4f9dff;
+  --display:"Barlow Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+.app{max-width:1320px;margin:0 auto;padding-block:16px 48px;padding-inline:16px}
+.nav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px;max-width:560px}
+.nav a{flex:1;text-align:center;text-decoration:none;font-size:.74rem;font-weight:600;color:var(--muted);background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;transition:color .15s,border-color .15s}
+.nav a:hover{color:var(--ink)}
+.nav a.active{color:var(--dim);border-color:var(--dim);background:rgba(79,157,255,.1)}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:.01em}
+h1{font-size:34px;font-weight:700;line-height:1;text-transform:uppercase}
+h2{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+h3{font-size:22px;font-weight:600;line-height:1.1}
+h4{font-family:var(--display);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:14px 0 6px}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;padding-bottom:16px;border-bottom:2px solid var(--ink);margin-bottom:20px}
+header.top .sub{color:var(--muted);margin-top:4px;max-width:70ch}
+.topctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:4px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:6px 14px;font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.qty{display:flex;align-items:center;gap:6px;font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.qty input{width:64px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:5px 6px;font-family:var(--mono)}
+
+.grid{display:grid;grid-template-columns:350px minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:1fr}}
+aside{display:flex;flex-direction:column;gap:14px}
+section.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px 16px}
+section.card h2{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+section.card h2 .n{font-family:var(--mono);font-size:12px;background:var(--ink);color:var(--bg);padding:1px 6px;border-radius:3px}
+.field{display:grid;grid-template-columns:1fr 128px;align-items:center;gap:8px;margin-bottom:8px}
+.field label{font-size:14px;color:var(--ink)}
+.field label small{display:block;color:var(--muted);font-size:12px;line-height:1.3}
+.field input,.field select{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:6px 8px;font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
+.field select{font-family:var(--body)}
+.field input:disabled{opacity:.55}
+.field.check{grid-template-columns:auto 1fr;justify-content:start}
+.field.check input{width:18px;height:18px;margin:0}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.35}
+.hint.warn{color:var(--warn)}
+.hint.bad{color:var(--bad)}
+
+table.mini{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+table.mini th{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-size:12px;color:var(--muted);text-align:left;padding:2px 4px}
+table.mini td{padding:3px 4px;vertical-align:middle}
+table.mini input,table.mini select{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:5px 6px;font-family:var(--mono);font-size:13px}
+.rm{background:transparent;border:1px solid var(--line);border-radius:4px;width:28px;height:28px;cursor:pointer;color:var(--muted);line-height:1}
+.rm:hover{color:var(--bad);border-color:var(--bad)}
+.add{margin-top:8px;background:transparent;border:1.5px dashed var(--line);border-radius:4px;padding:6px 10px;width:100%;cursor:pointer;color:var(--muted);font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.add:hover{color:var(--ink);border-color:var(--ink)}
+
+main{display:flex;flex-direction:column;gap:18px;min-width:0}
+.alerts{display:flex;flex-direction:column;gap:8px}
+.alerts:empty{display:none}
+.alert{border-left:4px solid var(--warn);background:var(--warn-soft);padding:8px 12px;border-radius:0 4px 4px 0;font-size:14px}
+.alert.bad{border-color:var(--bad);background:var(--bad-soft)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.stat{background:var(--panel);padding:10px 14px}
+.stat .k{font-family:var(--display);text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:var(--muted);font-weight:600}
+.stat .v{font-family:var(--mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:2px}
+.stat .s{font-size:12px;color:var(--muted);font-family:var(--mono)}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px 16px}
+.panel .head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:10px}
+.panel .head p{color:var(--muted);font-size:13.5px}
+.views{display:grid;grid-template-columns:1fr;gap:14px}
+.view{position:relative}
+.view .tag{position:absolute;left:8px;top:6px;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:var(--muted)}
+.view svg{width:100%;height:auto;max-height:420px;display:block;margin:0 auto}
+.scroll{overflow-x:auto;padding-bottom:4px}
+.layout svg{display:block;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted);margin-top:8px}
+.legend span::before{content:"";display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:-1px;border-radius:2px;background:var(--steel)}
+.legend span.b::before{background:var(--accent)}
+.legend span.x::before{background:repeating-linear-gradient(135deg,var(--steel) 0 2px,transparent 2px 5px)}
+.legend span.d::before{background:var(--dim);height:2px;vertical-align:3px}
+.legend span.m::before{background:transparent;border:2px solid var(--dim);border-radius:50%;width:8px;height:8px}
+
+table.sheet{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+table.sheet th{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-size:12.5px;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1.5px solid var(--ink);white-space:nowrap}
+table.sheet td{padding:7px 8px;border-bottom:1px solid var(--line-2);vertical-align:top}
+table.sheet td.n{font-family:var(--mono);white-space:nowrap}
+table.sheet td.n small{display:block;color:var(--muted);font-size:11.5px}
+table.sheet td small.sub{display:block;color:var(--muted);font-size:12px}
+table.sheet tr.bend td{background:var(--accent-soft)}
+table.sheet td .pill{display:inline-block;font-family:var(--display);font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:12px;padding:1px 7px;border-radius:3px;background:var(--accent);color:var(--accent-ink)}
+table.sheet tfoot td{font-weight:600;border-top:1.5px solid var(--ink);border-bottom:0}
+.copy{background:var(--ink);color:var(--bg);border:0;border-radius:4px;padding:7px 14px;font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-size:15px;cursor:pointer}
+.copy:hover{opacity:.9}
+.notes{font-size:14px;color:var(--muted);max-width:70ch}
+.notes ul{margin:6px 0 0;padding-left:18px}
+.notes li{margin-bottom:5px}
+.notes b{color:var(--ink);font-weight:600}
+.sheetblock+.sheetblock{margin-top:22px;padding-top:18px;border-top:1px dashed var(--line)}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="nav">
+    <a href="/index.html">Chainring</a>
+    <a href="/seatpost-gauge.html">Seatpost</a>
+    <a href="/handlebar-gauge.html">Bar clamp</a>
+    <a href="/ball-gauge.html">Bearings</a>
+    <a href="/pedal-gauge.html">Pedal</a>
+    <a href="/rack-bender.html" class="active">Rack bender</a>
+  </nav>
+  <header class="top">
+    <div>
+      <h1>Bike Rack Bender</h1>
+      <p class="sub">Bend sheets and a cut list for a tube rack that mounts on the bike. Size the deck, drop the legs to the eyelets, add stays and slats, then read the marks off the sheet.</p>
+    </div>
+    <div class="topctl">
+      <div class="seg" role="group" aria-label="Units">
+        <button type="button" id="unit-in" aria-pressed="true">inches</button>
+        <button type="button" id="unit-mm" aria-pressed="false">mm</button>
+      </div>
+      <label class="qty" for="qty">Racks <input type="number" id="qty" min="1" step="1" value="1" data-bind="qty" data-kind="int"></label>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside>
+      <section class="card">
+        <h2><span class="n">0</span> Start from</h2>
+        <div class="field"><label for="preset">Rack type <small>fills in typical dimensions</small></label>
+          <select id="preset"><option value="">Keep my numbers</option><option value="rear">Rear pannier rack</option><option value="porteur">Front porteur rack</option><option value="rando">Front rando rack</option></select></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">1</span> Tubing</h2>
+        <div class="field"><label for="material">Material</label>
+          <select id="material" data-bind="material" data-kind="str"><option value="crmo">4130 CrMo steel</option><option value="stainless">Stainless</option><option value="ti">Titanium</option><option value="alu">Aluminum</option></select></div>
+        <h4>Deck loop</h4>
+        <div class="field"><label for="deck-tube">Size</label><select id="deck-tube" data-tube="deck"></select></div>
+        <div class="field"><label for="deck-od">OD</label><input type="number" id="deck-od" step="any" min="0" data-bind="deck.od" data-kind="len"></div>
+        <div class="field"><label for="deck-wall">Wall</label><input type="number" id="deck-wall" step="any" min="0" data-bind="deck.wall" data-kind="len"></div>
+        <div class="field"><label for="deck-clr">Die CLR <small>centerline radius</small></label><input type="number" id="deck-clr" step="any" min="0" data-bind="deck.clr" data-kind="len"></div>
+        <p class="hint" id="deck-clr-hint"></p>
+        <h4>Legs and stays</h4>
+        <div class="field"><label for="leg-tube">Size</label><select id="leg-tube" data-tube="leg"></select></div>
+        <div class="field"><label for="leg-od">OD</label><input type="number" id="leg-od" step="any" min="0" data-bind="leg.od" data-kind="len"></div>
+        <div class="field"><label for="leg-wall">Wall</label><input type="number" id="leg-wall" step="any" min="0" data-bind="leg.wall" data-kind="len"></div>
+        <div class="field"><label for="leg-clr">Die CLR</label><input type="number" id="leg-clr" step="any" min="0" data-bind="leg.clr" data-kind="len"></div>
+        <p class="hint" id="leg-clr-hint"></p>
+        <h4>Slats</h4>
+        <div class="field"><label for="slat-tube">Size</label><select id="slat-tube" data-tube="slat"></select></div>
+        <div class="field"><label for="slat-od">OD</label><input type="number" id="slat-od" step="any" min="0" data-bind="slat.od" data-kind="len"></div>
+        <div class="field"><label for="slat-wall">Wall</label><input type="number" id="slat-wall" step="any" min="0" data-bind="slat.wall" data-kind="len"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">2</span> Deck</h2>
+        <div class="field"><label for="style">Loop</label>
+          <select id="style" data-bind="style" data-kind="str"><option value="open">U-loop, open at rear + rear bar</option><option value="closed">Closed loop, joined at rear center</option></select></div>
+        <div class="field"><label for="L">Length <small>outside, front to rear</small></label><input type="number" id="L" step="any" min="0" data-bind="L" data-kind="len"></div>
+        <div class="field"><label for="W">Width <small>outside, side to side</small></label><input type="number" id="W" step="any" min="0" data-bind="W" data-kind="len"></div>
+        <div class="field"><label for="lipA">Front lip angle <small>0 for a flat deck, 90 for an upright lip</small></label><input type="number" id="lipA" step="1" min="0" max="120" data-bind="lipA" data-kind="num"></div>
+        <div class="field"><label for="lipH">Lip rise <small>front rail centerline above the deck</small></label><input type="number" id="lipH" step="any" min="0" data-bind="lipH" data-kind="len"></div>
+        <p class="hint">The loop is one tube. Corners use the deck die. A lip adds a bend up on each side rail and a 90° rotation before the corner.</p>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">3</span> Legs</h2>
+        <div class="field"><label for="legH">Deck height <small>deck centerline above the eyelet</small></label><input type="number" id="legH" step="any" min="0" data-bind="legH" data-kind="len"></div>
+        <div class="field"><label for="eyelet">Eyelet spacing <small>center to center across the bike</small></label><input type="number" id="eyelet" step="any" min="0" data-bind="eyelet" data-kind="len"></div>
+        <div class="field"><label for="legPos">Leg position <small>from the rear of the deck</small></label><input type="number" id="legPos" step="any" min="0" data-bind="legPos" data-kind="len"></div>
+        <div class="field"><label for="legRake">Rake <small>eyelet forward (+) or behind (−) the leg top</small></label><input type="number" id="legRake" step="any" data-bind="legRake" data-kind="len"></div>
+        <div class="field"><label for="legTop">Leg top</label>
+          <select id="legTop" data-bind="legTop" data-kind="str"><option value="bent">Bent, lapped under the side rail</option><option value="straight">Straight strut, coped to the rail</option></select></div>
+        <div class="field" id="f-overlap"><label for="overlap">Lap length <small>straight run under the rail</small></label><input type="number" id="overlap" step="any" min="0" data-bind="overlap" data-kind="len"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">4</span> Stays</h2>
+        <div class="field"><label for="stayMode">Stays</label>
+          <select id="stayMode" data-bind="stayMode" data-kind="str"><option value="none">None</option><option value="sides">Two, from the side rails</option><option value="front">One, from the front rail center</option><option value="rear">One, from the rear center</option></select></div>
+        <div class="field" id="f-stayPos"><label for="stayPos">Attach point <small>from the rear of the deck</small></label><input type="number" id="stayPos" step="any" min="0" data-bind="stayPos" data-kind="len"></div>
+        <div class="field" id="f-stayFx"><label for="stayFx">Mount offset <small>forward (+) or behind (−) the attach point</small></label><input type="number" id="stayFx" step="any" data-bind="stayFx" data-kind="len"></div>
+        <div class="field" id="f-stayDrop"><label for="stayDrop">Mount drop <small>below the deck centerline</small></label><input type="number" id="stayDrop" step="any" data-bind="stayDrop" data-kind="len"></div>
+        <div class="field" id="f-staySpacing"><label for="staySpacing">Mount spacing <small>center to center</small></label><input type="number" id="staySpacing" step="any" min="0" data-bind="staySpacing" data-kind="len"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">5</span> Slats</h2>
+        <div class="field"><label for="slatN">Count</label><input type="number" id="slatN" step="1" min="0" max="20" data-bind="slatN" data-kind="int"></div>
+        <div class="field"><label for="slatDir">Direction</label>
+          <select id="slatDir" data-bind="slatDir" data-kind="str"><option value="across">Across the deck</option><option value="along">Lengthwise</option></select></div>
+        <div class="field"><label for="slatPrep">End prep</label>
+          <select id="slatPrep" data-bind="slatPrep" data-kind="str"><option value="cope">Coped (fishmouth)</option><option value="butt">Square cut</option></select></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">6</span> Extra bent part</h2>
+        <div class="field check"><input type="checkbox" id="customOn" data-bind="customOn" data-kind="bool"><label for="customOn">Add a part from a bend list <small>pannier rail, light mount, backstop</small></label></div>
+        <div id="custom-wrap">
+          <table class="mini" id="custom-table">
+            <thead><tr><th>#</th><th>Straight</th><th>Bend°</th><th>Rot°</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button type="button" class="add" id="add-seg">+ Add straight + bend</button>
+          <p class="hint">Distance, angle, rotation from end A. Rotation is how far you turn the tube in the die before the bend, clockwise looking from end A. Uses the deck tube and die.</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">7</span> Bender and ends</h2>
+        <div class="field"><label for="offset">Mark offset <small>bender reference line to true bend start</small></label><input type="number" id="offset" step="any" data-bind="offset" data-kind="len"></div>
+        <div class="field"><label for="overbend">Springback <small>degrees of overbend</small></label><input type="number" id="overbend" step="any" min="0" data-bind="overbend" data-kind="num"></div>
+        <div class="field"><label for="extra">Extra stock per end <small>trim after bending</small></label><input type="number" id="extra" step="any" min="0" data-bind="extra" data-kind="len"></div>
+        <div class="field"><label for="tab">Eyelet tab <small>flattened end past the hole center</small></label><input type="number" id="tab" step="any" min="0" data-bind="tab" data-kind="len"></div>
+      </section>
+    </aside>
+
+    <main>
+      <div class="alerts" id="alerts"></div>
+      <div class="stats" id="stats"></div>
+
+      <div class="panel">
+        <div class="head"><h3>Assembly</h3><p id="draw-sub"></p></div>
+        <div class="views">
+          <div class="view"><span class="tag">Plan · front is right</span><div id="view-plan"></div></div>
+          <div class="view"><span class="tag">Side · front is right</span><div id="view-side"></div></div>
+        </div>
+        <div class="legend"><span>Tube</span><span class="b">Bend tangent</span><span class="d">Dimension</span><span class="m">Eyelet or mount</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="head"><h3>Bend sheets</h3><p>One per bent part. Marks are tangent points from end A. Rotation is the turn in the die before that bend.</p></div>
+        <div id="sheets"></div>
+        <div class="legend" style="margin-top:12px"><span>Straight</span><span class="b">Bend</span><span class="x">Extra stock, trim after bending</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="head"><h3>Cut list</h3><button type="button" class="copy" id="copy">Copy sheet as text</button></div>
+        <div class="scroll"><table class="sheet" id="cut-table"></table></div>
+      </div>
+
+      <div class="panel notes">
+        <h3 style="color:var(--ink);margin-bottom:6px">Reading the sheets</h3>
+        <ul>
+          <li><b>End A on the deck loop</b> is the rear end of the left side rail (or the rear-center joint on a closed loop). On a leg it is the eyelet end. The drawing puts the bike's front on the right.</li>
+          <li><b>Marks are tangent points.</b> The tube starts curving at the start mark and is straight again at the end mark. Arc length is CLR × angle in radians and is already in the cut length.</li>
+          <li><b>Rotation</b> is measured looking down the tube from end A toward the bender, clockwise positive, relative to the plane of the previous bend. A 0 means the same plane, 180 means the opposite way in the same plane. Check the sign on your first lipped deck; benders differ in which way they read it.</li>
+          <li><b>Springback</b> is set on the bender, not on the marks. Thin-wall CrMo in a hand bender usually needs 2° to 4°.</li>
+          <li><b>Coped lengths</b> are tip to tip. Flattened eyelet ends include the tab past the hole center, so cut, bend, flatten, then drill on the mark.</li>
+          <li><b>Lapped legs</b> run straight under the side rail for the lap length and are brazed along the seam. Straight struts are coped to the rail and brazed at the joint.</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+const IN=25.4, PI=Math.PI;
+const PRESETS=[
+  {id:'c250-028', name:'1/4" × .028 CrMo',      od:0.25,    wall:0.028, clr:0.5625},
+  {id:'c3125-028',name:'5/16" × .028 CrMo',     od:0.3125,  wall:0.028, clr:0.6875},
+  {id:'c375-028', name:'3/8" × .028 CrMo',      od:0.375,   wall:0.028, clr:0.9375},
+  {id:'c375-035', name:'3/8" × .035 CrMo',      od:0.375,   wall:0.035, clr:0.9375},
+  {id:'c4375-035',name:'7/16" × .035 CrMo',     od:0.4375,  wall:0.035, clr:1.25},
+  {id:'c500-035', name:'1/2" × .035 CrMo',      od:0.5,     wall:0.035, clr:1.5},
+  {id:'m6',       name:'6 mm × 0.8 mm',         od:6/IN,    wall:0.8/IN, clr:0.5},
+  {id:'m8',       name:'8 mm × 0.9 mm',         od:8/IN,    wall:0.9/IN, clr:0.75},
+  {id:'m10',      name:'10 mm × 1.0 mm',        od:10/IN,   wall:1/IN,   clr:1.0},
+  {id:'m12',      name:'12 mm × 1.0 mm',        od:12/IN,   wall:1/IN,   clr:1.5},
+  {id:'r1875',    name:'3/16" solid rod',       od:0.1875,  wall:0.09375, clr:0.5},
+  {id:'r250',     name:'1/4" solid rod',        od:0.25,    wall:0.125,  clr:0.5625},
+  {id:'custom',   name:'Custom size',           od:0.375,   wall:0.028, clr:0.9375},
+];
+const DENSITY={crmo:0.2836, stainless:0.289, ti:0.163, alu:0.0975}; // lb per cubic inch
+const MAT_NAME={crmo:'4130 CrMo', stainless:'Stainless', ti:'Titanium', alu:'Aluminum'};
+
+const DEFAULTS={
+  unit:'in', qty:1, material:'crmo',
+  deck:{tube:'c375-028', od:0.375, wall:0.028, clr:0.9375},
+  leg:{tube:'c375-028', od:0.375, wall:0.028, clr:0.9375},
+  slat:{tube:'c250-028', od:0.25, wall:0.028},
+  style:'open', L:12, W:5, lipA:0, lipH:1,
+  legH:9.5, eyelet:5.5, legPos:1.5, legRake:0, legTop:'bent', overlap:2,
+  stayMode:'sides', stayPos:9, stayFx:1.5, stayDrop:5, staySpacing:4.5,
+  slatN:3, slatDir:'across', slatPrep:'cope',
+  customOn:false, custom:[{s:6,a:90,rot:0},{s:10,a:90,rot:0},{s:6,a:0,rot:0}],
+  offset:0, overbend:3, extra:0.75, tab:0.4,
+};
+const RACK_PRESETS={
+  rear:   {style:'open', L:12, W:5,  lipA:0,  lipH:1,    legH:9.5, eyelet:5.5,  legPos:1.5, legRake:0, legTop:'bent', overlap:2, stayMode:'sides', stayPos:9,  stayFx:1.5, stayDrop:5,  staySpacing:4.5, slatN:3, slatDir:'across'},
+  porteur:{style:'open', L:13, W:12, lipA:90, lipH:1.25, legH:7,   eyelet:4.25, legPos:2,   legRake:0, legTop:'bent', overlap:2, stayMode:'rear',  stayPos:0,  stayFx:-2,  stayDrop:3.5, staySpacing:0,  slatN:3, slatDir:'along'},
+  rando:  {style:'open', L:8,  W:8,  lipA:90, lipH:1,    legH:6,   eyelet:4.25, legPos:1.5, legRake:0, legTop:'bent', overlap:1.5, stayMode:'rear', stayPos:0, stayFx:-1.5, stayDrop:3, staySpacing:0,  slatN:2, slatDir:'across'},
+};
+let S=JSON.parse(JSON.stringify(DEFAULTS));
+try{ const saved=JSON.parse(localStorage.getItem('brb2-state')||'null'); if(saved&&typeof saved==='object'){ S=Object.assign(S,saved); ['deck','leg','slat'].forEach(k=>S[k]=Object.assign({},DEFAULTS[k],saved[k]||{})); } }catch(e){}
+function save(){ try{ localStorage.setItem('brb2-state',JSON.stringify(S)); }catch(e){} }
+
+const $=id=>document.getElementById(id);
+const toDisp=v=>S.unit==='mm'?v*IN:v, fromDisp=v=>S.unit==='mm'?v/IN:v;
+function gcd(a,b){return b?gcd(b,a%b):a;}
+function fmt(v){
+  if(!isFinite(v)) return '—';
+  if(S.unit==='mm') return (v*IN).toFixed(1)+' mm';
+  const neg=v<0, a=Math.abs(v); let whole=Math.floor(a), f=Math.round((a-whole)*32); if(f===32){whole++;f=0;}
+  let s; if(f){const g=gcd(f,32); s=(whole?whole+' ':'')+(f/g)+'/'+(32/g);} else s=String(whole);
+  return (neg?'−':'')+s+'"';
+}
+function dec(v){ if(!isFinite(v)) return '—'; return S.unit==='mm'?(v*IN).toFixed(1):v.toFixed(3); }
+function dispInput(v){ return S.unit==='mm'?String(+(v*IN).toFixed(1)):String(+v.toFixed(3)); }
+function grams(lb){ return lb*453.592; }
+function wt(lb){ const g=grams(lb); return g>=1000?(g/1000).toFixed(2)+' kg':Math.round(g)+' g'; }
+function lenBoth(v){ return `<td class="n">${fmt(v)}<small>${dec(v)}</small></td>`; }
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function get(path){ return path.split('.').reduce((o,k)=>o[k],S); }
+function set(path,v){ const ks=path.split('.'); let o=S; for(let i=0;i<ks.length-1;i++) o=o[ks[i]]; o[ks[ks.length-1]]=v; }
+
+/* ---------- vectors ---------- */
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]], sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]], mul=(a,k)=>[a[0]*k,a[1]*k,a[2]*k];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2], cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const len=a=>Math.sqrt(dot(a,a)), norm=a=>{const l=len(a);return l>1e-12?mul(a,1/l):[0,0,0];};
+function rotAbout(v,k,ang){ const c=Math.cos(ang), s=Math.sin(ang); return add(add(mul(v,c),mul(cross(k,v),s)),mul(k,dot(k,v)*(1-c))); }
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------- part tracing ----------
+ part: {name, od, start:[x,y,z], h:[dir], segs:[{s}|{bend:{R, to:[dir]}|{R, a, rot}}], X0, X1, sheetNote}
+ returns geometry (sampled 3D polyline, tangent events) and the bend sheet (rows, total) */
+function trace(part){
+  let p=part.start.slice(), h=norm(part.h), uRef=null, pos=part.X0||0;
+  const pts=[p.slice()], ev=[], rows=[], rawStraights=[];
+  const S0=part.segs;
+  let firstBend=true;
+  for(let i=0;i<S0.length;i++){
+    const sg=S0[i];
+    if(sg.bend===undefined){
+      let s=sg.s; let raw=s;
+      if(i===0) raw+=part.X0||0; if(i===S0.length-1) raw+=part.X1||0;
+      rows.push({type:'straight',len:raw,neg:s<0});
+      p=add(p,mul(h,Math.max(0,s))); pts.push(p.slice()); pos+=Math.max(0,s);
+      continue;
+    }
+    const b=sg.bend, R=b.R; let th,u,rot;
+    if(b.to){
+      const t=norm(b.to); th=Math.acos(clamp(dot(h,t),-1,1)); u=norm(sub(t,mul(h,Math.cos(th))));
+      if(th<1e-6){ continue; }
+      if(uRef===null){ rot=0; } else { rot=Math.atan2(dot(cross(uRef,u),h),dot(uRef,u)); }
+    } else {
+      th=b.a*PI/180; rot=(b.rot||0)*PI/180;
+      if(uRef===null){ uRef=norm(sub([0,0,1],mul(h,h[2]))); if(len(uRef)<1e-6) uRef=[1,0,0]; }
+      u=norm(rotAbout(uRef,h,rot));
+      if(th<1e-6){ uRef=u; continue; }
+    }
+    const arc=R*th, start=pos, end=pos+arc;
+    ev.push({pt:p.slice(),h:h.slice()});
+    for(let k=1;k<=12;k++){ const t=th*k/12; pts.push(add(p,add(mul(h,R*Math.sin(t)),mul(u,R*(1-Math.cos(t)))))); }
+    const h2=add(mul(h,Math.cos(th)),mul(u,Math.sin(th)));
+    uRef=add(mul(h,-Math.sin(th)),mul(u,Math.cos(th)));
+    p=pts[pts.length-1].slice(); h=norm(h2);
+    ev.push({pt:p.slice(),h:h.slice()});
+    rows.push({type:'bend',a:th*180/PI,R,rot:rot*180/PI,arc,start,end,gain:2*R*Math.tan(th/2)-arc});
+    pos=end;
+  }
+  return {pts,ev,rows,total:pos,end:p,endH:h};
+}
+
+/* ---------- build the rack ---------- */
+function saddle(D,c){ return c>=D?D/2:D/2-Math.sqrt(Math.max(0,(D/2)**2-(c/2)**2)); }
+function areaOf(t){ return PI/4*(t.od*t.od-Math.max(0,t.od-2*t.wall)**2); }
+
+function build(){
+  const errs=[], warns=[], parts=[], mounts=[], cuts=[];
+  const d=S.deck.od, R=S.deck.clr, Lc=S.L-d, Wc=S.W-d, X=Math.max(0,S.extra);
+  const dens=DENSITY[S.material];
+  const lbIn={deck:areaOf(S.deck)*dens, leg:areaOf(S.leg)*dens, slat:areaOf(S.slat)*dens};
+  const a=S.lipA*PI/180, hasLip=S.lipA>0&&S.lipH>0;
+  let s=0, lipX=R;
+  if(hasLip){ s=(S.lipH-R*(1-Math.cos(a))-R*Math.sin(a))/Math.sin(a); lipX=R*Math.sin(a)+s*Math.cos(a)+R*Math.cos(a);
+    if(s<0) errs.push(`Lip rise ${fmt(S.lipH)} is too small for a ${S.lipA}° lip on a ${fmt(R)} die. Minimum is ${fmt(R*(1-Math.cos(a))+R*Math.sin(a))}.`); }
+  const front=Wc-2*R;
+  if(front<0) errs.push(`Deck width ${fmt(S.W)} is too narrow for two corners on a ${fmt(R)} die. Minimum ${fmt(2*R+d)}.`);
+  const sideStraight = S.style==='open' ? Lc-lipX : Lc-R-lipX;
+  if(sideStraight<0) errs.push(`Deck length ${fmt(S.L)} is too short for the corners${hasLip?' and lip':''}. Side rails come out ${fmt(sideStraight)}.`);
+  const lipFrontZ = hasLip?S.lipH:0;
+  const lipStartX = S.style==='open' ? sideStraight : R+sideStraight; // x where the side rail ends (lip bend start or corner start)
+
+  // deck loop
+  const segs=[];
+  const leftSide=()=>{ segs.push({s:sideStraight}); if(hasLip){ segs.push({bend:{R,to:[Math.cos(a),0,Math.sin(a)]}}); segs.push({s}); } segs.push({bend:{R,to:[0,-1,0]}}); };
+  const rightSide=()=>{ if(hasLip){ segs.push({bend:{R,to:[-Math.cos(a),0,-Math.sin(a)]}}); segs.push({s}); segs.push({bend:{R,to:[-1,0,0]}}); } else segs.push({bend:{R,to:[-1,0,0]}}); segs.push({s:sideStraight}); };
+  let deck;
+  if(S.style==='open'){
+    leftSide(); segs.push({s:front}); rightSide();
+    deck={name:'Deck loop',od:d,start:[0,Wc/2,0],h:[1,0,0],segs,X0:X,X1:X,role:'deck',tube:'deck'};
+  } else {
+    segs.push({s:Wc/2-R}); segs.push({bend:{R,to:[1,0,0]}}); leftSide(); segs.push({s:front}); rightSide(); segs.push({bend:{R,to:[0,1,0]}}); segs.push({s:Wc/2-R});
+    deck={name:'Deck loop',od:d,start:[0,0,0],h:[0,1,0],segs,X0:X,X1:X,role:'deck',tube:'deck'};
+    if(Wc/2-R<0) errs.push('Deck width is too narrow for the rear corners.');
+  }
+  deck.geo=trace(deck); deck.cut=deck.geo.total; deck.sheet=true; deck.weight=deck.cut*lbIn.deck;
+  deck.prep = S.style==='open' ? 'both ends square, brazed to the rear bar' : 'ends meet at the rear center, sleeve or butt braze';
+  parts.push(deck);
+  if(S.style==='open'){
+    const gap=Wc-d, L2=S.slatPrep==='cope'?gap+2*saddle(d,d):gap;
+    parts.push({name:'Rear bar',od:d,role:'bar',tube:'deck',cut:L2,count:1,weight:L2*lbIn.deck,line:[[0,-gap/2,0],[0,gap/2,0]],prep:S.slatPrep==='cope'?`coped both ends, tip to tip`:'square cut, clear gap'});
+  }
+  // legs
+  const c=S.leg.od, Rl=S.leg.clr, tab=Math.max(0,S.tab);
+  const legNote=[];
+  [1,-1].forEach((sign,idx)=>{
+    const P=[S.legPos+S.legRake, sign*S.eyelet/2, -S.legH];
+    mounts.push({pt:P,r:c*0.35});
+    if(S.legTop==='bent'){
+      const A=[S.legPos, sign*Wc/2, -(d+c)/2];
+      let v=norm(sub(A,P)), beta=0, t=0, Vx=A;
+      for(let k=0;k<30;k++){ beta=Math.acos(clamp(v[0],-1,1)); t=Rl*Math.tan(beta/2); Vx=sub(A,[t,0,0]); v=norm(sub(Vx,P)); }
+      const legStraight=len(sub(Vx,P))-t;
+      const part={name:idx===0?'Leg (left)':'Leg (right)',od:c,tube:'leg',role:'leg',start:sub(P,mul(v,tab)),h:v,segs:[{s:tab+legStraight},{bend:{R:Rl,to:[1,0,0]}},{s:S.overlap}],X0:0,X1:X};
+      part.geo=trace(part); part.cut=part.geo.total; part.weight=part.cut*lbIn.leg; part.sheet=idx===0;
+      part.prep=`eyelet end flattened and drilled ${fmt(tab)} from the tip; lap ${fmt(S.overlap)} under the rail`;
+      if(legStraight<0) errs.push('Leg is too short to fit the bend. Raise the deck or move the eyelet.');
+      if(idx===0){ legNote.push(`Bend ${(beta*180/PI).toFixed(1)}° so the lap runs forward under the rail. Make the right leg as a mirror image.`);
+        if(S.legPos+S.overlap>lipStartX-1e-9) warns.push(`Leg lap runs ${fmt(S.legPos+S.overlap-lipStartX)} past the end of the straight side rail. Shorten the lap or move the legs back.`); }
+      parts.push(part);
+    } else {
+      const Q=[S.legPos, sign*Wc/2, 0];
+      const dist=len(sub(Q,P)), v=norm(sub(Q,P));
+      const cut=tab+dist-(d/2-saddle(d,c));
+      const part={name:idx===0?'Leg (left)':'Leg (right)',od:c,tube:'leg',role:'leg',cut,weight:cut*lbIn.leg,line:[sub(P,mul(v,tab)),Q],prep:`eyelet end flattened and drilled ${fmt(tab)} from the tip; top coped to the rail`};
+      parts.push(part);
+      if(idx===0 && S.legPos>lipStartX) warns.push('Leg attaches beyond the straight side rail. Move the legs back.');
+    }
+  });
+  // stays
+  if(S.stayMode!=='none'){
+    const list=[];
+    if(S.stayMode==='sides'){ [1,-1].forEach(sign=>list.push({Q:[S.stayPos,sign*Wc/2,0],M:[S.stayPos+S.stayFx,sign*S.staySpacing/2,-S.stayDrop]}));
+      if(S.stayPos>lipStartX) warns.push('Stays attach beyond the straight side rail. Move them back or shorten the deck lip.'); }
+    else if(S.stayMode==='front') list.push({Q:[Lc,0,lipFrontZ],M:[Lc+S.stayFx,0,lipFrontZ-S.stayDrop]});
+    else list.push({Q:[0,0,0],M:[S.stayFx,0,-S.stayDrop]});
+    list.forEach((st,i)=>{
+      const dist=len(sub(st.M,st.Q)), v=norm(sub(st.Q,st.M));
+      const cut=tab+dist-(d/2-saddle(d,c));
+      mounts.push({pt:st.M,r:c*0.35});
+      parts.push({name:list.length>1?`Stay (${i===0?'left':'right'})`:'Stay',od:c,tube:'leg',role:'stay',cut,weight:cut*lbIn.leg,line:[sub(st.M,mul(v,tab)),st.Q],prep:`mount end flattened and drilled ${fmt(tab)} from the tip; other end coped`});
+    });
+  }
+  // slats
+  const cs=S.slat.od, n=Math.max(0,Math.round(S.slatN));
+  if(n>0){
+    const sad=saddle(d,cs);
+    if(S.slatDir==='across'){
+      const x0=d/2, x1=lipStartX-cs/2, gap=Wc-d, cut=S.slatPrep==='cope'?gap+2*sad:gap;
+      const lines=[]; for(let i=0;i<n;i++){ const x=x0+(x1-x0)*(i+1)/(n+1); lines.push([[x,-gap/2,0],[x,gap/2,0]]); }
+      parts.push({name:'Deck slat',od:cs,tube:'slat',role:'slat',cut,count:n,weight:cut*lbIn.slat,lines,prep:S.slatPrep==='cope'?'coped both ends, tip to tip':'square cut, clear gap'});
+      if(x1<x0) errs.push('No straight deck left for cross slats.');
+    } else {
+      const xa=d/2, xb=hasLip?lipStartX:Lc-d/2, gap=xb-xa, cut=S.slatPrep==='cope'?gap+2*sad:gap;
+      const lines=[]; for(let i=0;i<n;i++){ const y=-Wc/2+d/2+(Wc-d)*(i+1)/(n+1); lines.push([[xa,y,0],[xb,y,0]]); }
+      parts.push({name:'Deck slat',od:cs,tube:'slat',role:'slat',cut,count:n,weight:cut*lbIn.slat,lines,prep:(S.slatPrep==='cope'?'coped both ends, tip to tip':'square cut, clear gap')+(hasLip?'; front end meets the lip bend':'')});
+    }
+  }
+  // custom part
+  let custom=null;
+  if(S.customOn && S.custom.length){
+    const rows=S.custom; const cseg=[];
+    rows.forEach((r,i)=>{ cseg.push({s:Math.max(0,+r.s||0)}); if(i<rows.length-1) cseg.push({bend:{R,a:clamp(+r.a||0,0,180),rot:+r.rot||0}}); });
+    custom={name:'Extra part',od:d,tube:'deck',role:'custom',start:[0,0,0],h:[1,0,0],segs:cseg,X0:X,X1:X};
+    custom.geo=trace(custom); custom.cut=custom.geo.total; custom.weight=custom.cut*lbIn.deck; custom.sheet=true; custom.prep='ends as needed';
+  }
+  // CLR sanity
+  if(R<1.5*d) warns.push(`Deck die CLR ${fmt(R)} is under 1.5× OD. Thin-wall tube will flatten or kink; use a mandrel or a bigger die.`);
+  if(S.legTop==='bent' && Rl<1.5*c) warns.push(`Leg die CLR ${fmt(Rl)} is under 1.5× OD.`);
+  const bends=parts.reduce((k,p)=>k+(p.geo?p.geo.rows.filter(r=>r.type==='bend').length:0),0)+(custom?custom.geo.rows.filter(r=>r.type==='bend').length:0);
+  const all=parts.concat(custom?[custom]:[]);
+  const totalLen=all.reduce((k,p)=>k+p.cut*(p.count||1),0), weight=all.reduce((k,p)=>k+p.weight*(p.count||1),0);
+  return {parts,custom,mounts,errs,warns,legNote,bends,totalLen,weight,lbIn,dims:{Lc,Wc,d,lipFrontZ,hasLip,lipStartX}};
+}
+
+/* ---------- drawing ---------- */
+function drawView(container, items, mounts, dims, proj, label){
+  // items: {pts (3D), od, ev, role} or {line:[a,b], od} or {lines:[[a,b]...], od}
+  const P=p=>proj(p);
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity, maxOd=0;
+  const bump=(q,od)=>{minX=Math.min(minX,q[0]-od/2);maxX=Math.max(maxX,q[0]+od/2);minY=Math.min(minY,q[1]-od/2);maxY=Math.max(maxY,q[1]+od/2);maxOd=Math.max(maxOd,od);};
+  items.forEach(it=>{ if(it.pts) it.pts.forEach(p=>bump(P(p),it.od)); if(it.line) it.line.forEach(p=>bump(P(p),it.od)); if(it.lines) it.lines.forEach(l=>l.forEach(p=>bump(P(p),it.od))); });
+  mounts.forEach(m=>bump(P(m.pt),m.r*2));
+  if(!isFinite(minX)){container.innerHTML='';return;}
+  const W=maxX-minX, H=maxY-minY, big=Math.max(W,H,1);
+  const pad=big*0.16, fs=Math.max(big*0.035,maxOd*1.1), sw=big*0.004;
+  const vb=`${minX-pad} ${minY-pad*0.9} ${W+2*pad} ${H+pad*1.8}`;
+  let g='';
+  const poly=(pts2,od,opt)=>{ const d=pts2.map((q,i)=>(i?'L':'M')+q[0]+' '+q[1]).join(' ');
+    g+=`<path d="${d}" fill="none" stroke="var(--steel-edge)" stroke-width="${od+sw*2}" stroke-linejoin="round" stroke-linecap="butt" opacity="${opt.o||1}"/>`;
+    g+=`<path d="${d}" fill="none" stroke="${opt.color||'var(--steel)'}" stroke-width="${od}" stroke-linejoin="round" stroke-linecap="butt" opacity="${opt.o||1}"/>`;
+    if(opt.center) g+=`<path d="${d}" fill="none" stroke="var(--center)" stroke-width="${sw*0.7}" stroke-dasharray="${big*0.015} ${big*0.01}" opacity=".6"/>`; };
+  // slats and struts first, deck on top
+  items.filter(i=>i.role==='slat'||i.role==='bar').forEach(it=>{ const ls=it.lines||[it.line]; ls.forEach(l=>poly(l.map(P),it.od,{color:'var(--steel-2)'})); });
+  items.filter(i=>i.role==='leg'||i.role==='stay').forEach(it=>{ if(it.pts) poly(it.pts.map(P),it.od,{center:true}); else poly(it.line.map(P),it.od,{}); });
+  items.filter(i=>i.role==='deck'||i.role==='custom').forEach(it=>poly(it.pts.map(P),it.od,{center:true}));
+  // tangent ticks
+  items.forEach(it=>{ if(!it.ev) return; it.ev.forEach(e=>{ const q=P(e.pt), hh=P(e.h); const l=Math.hypot(hh[0],hh[1]); if(l<0.3) return; const n=[-hh[1]/l,hh[0]/l], L=it.od*0.9;
+    g+=`<line x1="${q[0]-n[0]*L}" y1="${q[1]-n[1]*L}" x2="${q[0]+n[0]*L}" y2="${q[1]+n[1]*L}" stroke="var(--accent)" stroke-width="${sw*2.2}"/>`; }); });
+  mounts.forEach(m=>{ const q=P(m.pt); g+=`<circle cx="${q[0]}" cy="${q[1]}" r="${m.r}" fill="var(--panel)" stroke="var(--dim)" stroke-width="${sw*1.6}"/>`; });
+  // dimensions
+  dims.forEach(dm=>{
+    const a=dm.a, b=dm.b, horiz=Math.abs(b[0]-a[0])>=Math.abs(b[1]-a[1]), off=big*0.02;
+    g+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="var(--dim)" stroke-width="${sw}"/>`;
+    if(horiz){ g+=`<line x1="${a[0]}" y1="${a[1]-off}" x2="${a[0]}" y2="${a[1]+off}" stroke="var(--dim)" stroke-width="${sw}"/><line x1="${b[0]}" y1="${b[1]-off}" x2="${b[0]}" y2="${b[1]+off}" stroke="var(--dim)" stroke-width="${sw}"/>`;
+      g+=`<text x="${(a[0]+b[0])/2}" y="${a[1]+(dm.below?fs*1.2:-fs*0.4)}" font-size="${fs}" text-anchor="middle" fill="var(--dim)">${esc(dm.label)}</text>`; }
+    else { g+=`<line x1="${a[0]-off}" y1="${a[1]}" x2="${a[0]+off}" y2="${a[1]}" stroke="var(--dim)" stroke-width="${sw}"/><line x1="${b[0]-off}" y1="${b[1]}" x2="${b[0]+off}" y2="${b[1]}" stroke="var(--dim)" stroke-width="${sw}"/>`;
+      const cx=a[0]+(dm.left?-fs*0.5:fs*0.5), cy=(a[1]+b[1])/2;
+      g+=`<text x="${cx}" y="${cy}" font-size="${fs}" text-anchor="middle" dominant-baseline="${dm.left?'auto':'hanging'}" fill="var(--dim)" transform="rotate(-90 ${cx} ${cy})">${esc(dm.label)}</text>`; }
+  });
+  // end labels for parts with sheets
+  items.forEach(it=>{ if(!it.pts||!it.sheet) return; const q=P(it.pts[0]); g+=`<text x="${q[0]}" y="${q[1]+fs*1.4}" font-size="${fs}" text-anchor="middle" font-weight="700" fill="var(--accent)">A</text>`; });
+  container.innerHTML=`<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" font-family="JetBrains Mono, Menlo, monospace" role="img" aria-label="${label}">${g}</svg>`;
+}
+
+function renderDrawing(m){
+  const {Lc,Wc,d,lipFrontZ,hasLip}=m.dims;
+  const items=m.parts.map(p=>p.geo?{pts:p.geo.pts,ev:p.geo.ev,od:p.od,role:p.role,sheet:p.sheet}:p);
+  const plan=p=>[p[0],-p[1]], side=p=>[p[0],-p[2]];
+  const padL=d*1.6;
+  const planDims=[
+    {a:[-d/2,-(Wc/2+d/2)-padL],b:[Lc+d/2,-(Wc/2+d/2)-padL],label:`${fmt(S.L)} long`},
+    {a:[Lc+d/2+padL,-(Wc/2+d/2)],b:[Lc+d/2+padL,(Wc/2+d/2)],label:`${fmt(S.W)} wide`},
+  ];
+  const ex=S.legPos+S.legRake;
+  const exd=Math.min(-d/2,ex)-padL*2.4;
+  planDims.push({a:[exd,-S.eyelet/2],b:[exd,S.eyelet/2],label:`${fmt(S.eyelet)} eyelets`,left:true});
+  drawView($('view-plan'),items,m.mounts,planDims,plan,'Plan view of the rack');
+  const sideDims=[
+    {a:[S.legPos+S.legRake-padL*2.2,S.legH],b:[S.legPos+S.legRake-padL*2.2,0],label:`${fmt(S.legH)} deck height`,left:true},
+  ];
+  if(hasLip) sideDims.push({a:[Lc+d/2+padL,-lipFrontZ],b:[Lc+d/2+padL,0],label:`${fmt(S.lipH)} lip`});
+  if(S.stayMode!=='none') sideDims.push({a:[Lc+d/2+padL*(hasLip?2.4:1),S.stayDrop-(S.stayMode==='front'?lipFrontZ:0)],b:[Lc+d/2+padL*(hasLip?2.4:1),-(S.stayMode==='front'?lipFrontZ:0)],label:`${fmt(S.stayDrop)} stay drop`});
+  drawView($('view-side'),items,m.mounts,sideDims,side,'Side view of the rack');
+  $('draw-sub').textContent=`${m.bends} bends · ${fmt(m.totalLen)} of tube · about ${wt(m.weight)} per rack`;
+}
+
+/* ---------- sheets ---------- */
+function renderLayout(part){
+  const rows=part.geo.rows, total=part.geo.total, bendsRows=rows.filter(r=>r.type==='bend');
+  const nMarks=bendsRows.length*2+2, Wpx=Math.max(700,nMarks*84), Hpx=150, mL=40, mR=40, barY=64, barH=26;
+  const sc=(Wpx-mL-mR)/Math.max(total,1e-6), X=x=>mL+x*sc;
+  let g=`<defs><pattern id="hatch-${part.key}" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--steel)" stroke-width="2"/></pattern></defs>`;
+  g+=`<rect x="${X(0)}" y="${barY}" width="${total*sc}" height="${barH}" fill="var(--steel)"/>`;
+  bendsRows.forEach(b=>{ g+=`<rect x="${X(b.start)}" y="${barY}" width="${b.arc*sc}" height="${barH}" fill="var(--accent)"/>`; });
+  const X0=part.X0||0, X1=part.X1||0;
+  if(X0>0){ g+=`<rect x="${X(0)}" y="${barY}" width="${X0*sc}" height="${barH}" fill="url(#hatch-${part.key})"/><line x1="${X(X0)}" y1="${barY-4}" x2="${X(X0)}" y2="${barY+barH+4}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 2"/>`; }
+  if(X1>0){ g+=`<rect x="${X(total-X1)}" y="${barY}" width="${X1*sc}" height="${barH}" fill="url(#hatch-${part.key})"/><line x1="${X(total-X1)}" y1="${barY-4}" x2="${X(total-X1)}" y2="${barY+barH+4}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 2"/>`; }
+  g+=`<rect x="${X(0)}" y="${barY}" width="${total*sc}" height="${barH}" fill="none" stroke="var(--steel-edge)" stroke-width="1.5"/>`;
+  const marks=[]; bendsRows.forEach(b=>{marks.push({p:b.start,k:'start'});marks.push({p:b.end,k:'end'});});
+  marks.forEach((mk,i)=>{ const x=X(mk.p), up=i%2===0, y=up?barY-14:barY+barH+22;
+    g+=`<line x1="${x}" y1="${barY-6}" x2="${x}" y2="${barY+barH+6}" stroke="var(--ink)" stroke-width="1.5"/>`;
+    g+=`<text x="${x}" y="${y}" font-size="12" text-anchor="middle" fill="var(--ink)">${fmt(mk.p)}</text><text x="${x}" y="${up?y-13:y+13}" font-size="10" text-anchor="middle" fill="var(--muted)">${mk.k}</text>`; });
+  bendsRows.forEach((b,i)=>{ const cx=X((b.start+b.end)/2);
+    g+=`<text x="${cx}" y="${barY+barH/2+4}" font-size="11" font-weight="600" text-anchor="middle" fill="var(--accent-ink)">${i+1}</text>`;
+    g+=`<text x="${cx}" y="${barY+barH+50}" font-size="11" text-anchor="middle" fill="var(--accent)">${b.a.toFixed(0)}°${i?` · rot ${b.rot.toFixed(0)}°`:''}</text>`; });
+  g+=`<text x="${X(0)}" y="${barY+barH+72}" font-size="13" font-weight="600" fill="var(--ink)">END A</text><text x="${X(total)}" y="${barY+barH+72}" font-size="13" font-weight="600" text-anchor="end" fill="var(--ink)">END B · ${fmt(total)}</text>`;
+  return `<div class="scroll layout"><svg viewBox="0 0 ${Wpx} ${Hpx}" width="${Wpx}" height="${Hpx}" style="min-width:${Wpx}px" xmlns="http://www.w3.org/2000/svg" font-family="JetBrains Mono, Menlo, monospace" role="img" aria-label="${esc(part.name)} straight stick with bend marks">${g}</svg></div>`;
+}
+function renderBendTable(part){
+  const rows=part.geo.rows, total=part.geo.total;
+  let h=`<div class="scroll"><table class="sheet"><thead><tr><th>Step</th><th>What</th><th>From end A</th><th>From end B</th><th>Bender mark</th><th>Detail</th></tr></thead><tbody>`;
+  let bi=0, si=0; const nS=rows.filter(r=>r.type==='straight').length;
+  rows.forEach(r=>{
+    if(r.type==='straight'){ si++; const label=si===1?'Straight from end A':si===nS?'Straight to end B':'Straight';
+      const extra=(si===1&&part.X0)||(si===nS&&part.X1)?`includes ${fmt(si===1?part.X0:part.X1)} extra stock`:'';
+      h+=`<tr><td></td><td>${label}${r.neg?' <span style="color:var(--bad)">(negative)</span>':''}</td>${lenBoth(r.len)}<td></td><td></td><td>${extra}</td></tr>`; }
+    else { bi++; const setTo=(r.a+S.overbend).toFixed(1).replace(/\.0$/,''); const rot=bi===1?'orient the tube as you like':`rotate ${Math.abs(r.rot).toFixed(0)}° ${r.rot>=0?'clockwise':'counter-clockwise'}${Math.abs(r.rot)<0.5?' (same plane)':''}`;
+      h+=`<tr class="bend"><td class="n"><span class="pill">Bend ${bi}</span></td><td>Start · ${r.a.toFixed(1).replace(/\.0$/,'')}°<small class="sub">${rot}</small></td>${lenBoth(r.start)}${lenBoth(total-r.start)}${lenBoth(r.start-S.offset)}<td>Set bender to ${setTo}° · CLR ${fmt(r.R)}</td></tr>`;
+      h+=`<tr class="bend"><td></td><td>End</td>${lenBoth(r.end)}${lenBoth(total-r.end)}<td></td><td>Arc ${fmt(r.arc)} · take-up ${fmt(r.gain)}</td></tr>`; }
+  });
+  h+=`</tbody><tfoot><tr><td></td><td>Cut length</td>${lenBoth(total)}<td></td><td></td><td>${part.od?fmt(part.od)+' OD':''}</td></tr></tfoot></table></div>`;
+  return h;
+}
+function renderSheets(m){
+  const list=m.parts.filter(p=>p.sheet).concat(m.custom?[m.custom]:[]);
+  $('sheets').innerHTML=list.map((p,i)=>{ p.key=i;
+    const note = p.role==='leg' ? m.legNote.join(' ') : p.role==='deck' ? 'Symmetric loop. Lay out bends from both ends so take-up error does not stack on one side.' : '';
+    return `<div class="sheetblock"><div class="head"><h3>${esc(p.name)}</h3><p>${fmt(p.od)} OD · ${m.bends?'':''}${p.geo.rows.filter(r=>r.type==='bend').length} bends · cut ${fmt(p.geo.total)}</p></div>${renderLayout(p)}<div style="height:10px"></div>${renderBendTable(p)}${note?`<p class="hint" style="margin-top:8px">${esc(note)}</p>`:''}</div>`;
+  }).join('');
+}
+
+/* ---------- cut list, stats, alerts ---------- */
+function tubeName(k){ const t=S[k]; return `${fmt(t.od)} OD × ${fmt(t.wall)} wall`; }
+function renderCut(m){
+  const q=Math.max(1,Math.round(S.qty));
+  const all=m.parts.concat(m.custom?[m.custom]:[]);
+  let h=`<thead><tr><th>Piece</th><th>Per rack</th><th>Cut length</th><th>Tube</th><th>Weight</th><th>Total for ${q}</th></tr></thead><tbody>`;
+  all.forEach(p=>{ const n=p.count||1;
+    h+=`<tr><td>${esc(p.name)}<small class="sub">${esc(p.prep||'')}</small></td><td class="n">${n}</td>${lenBoth(p.cut)}<td>${tubeName(p.tube)}</td><td class="n">${wt(p.weight)}</td><td class="n">${fmt(p.cut*n*q)}</td></tr>`; });
+  h+=`</tbody><tfoot><tr><td>Total</td><td></td><td class="n">${fmt(m.totalLen)}</td><td>${MAT_NAME[S.material]}</td><td class="n">${wt(m.weight)}</td><td class="n">${fmt(m.totalLen*q)} · ${wt(m.weight*q)}</td></tr></tfoot>`;
+  $('cut-table').innerHTML=h;
+}
+function renderStats(m){
+  const q=Math.max(1,Math.round(S.qty)), pieces=m.parts.concat(m.custom?[m.custom]:[]).reduce((k,p)=>k+(p.count||1),0);
+  const items=[
+    ['Deck cut', fmt(m.parts[0].cut), `${m.parts[0].geo.rows.filter(r=>r.type==='bend').length} bends`],
+    ['Pieces', String(pieces), `${m.bends} bends total`],
+    ['Tube', fmt(m.totalLen), S.unit==='mm'?(m.totalLen*IN/1000).toFixed(2)+' m':(m.totalLen/12).toFixed(2)+' ft'],
+    ['Weight', wt(m.weight), `${(grams(m.weight)/28.3495).toFixed(1)} oz`],
+    ['Batch', `${q} rack${q===1?'':'s'}`, fmt(m.totalLen*q)],
+  ];
+  $('stats').innerHTML=items.map(([k,v,s])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+}
+function renderAlerts(m){ $('alerts').innerHTML=m.errs.map(e=>`<div class="alert bad">${esc(e)}</div>`).join('')+m.warns.map(w=>`<div class="alert">${esc(w)}</div>`).join(''); }
+function sheetText(m){
+  const q=Math.max(1,Math.round(S.qty)), L=[];
+  L.push(`BIKE RACK BEND SHEET · qty ${q} · ${MAT_NAME[S.material]}`);
+  L.push(`Deck ${fmt(S.L)} × ${fmt(S.W)}${m.dims.hasLip?` · ${S.lipA}° lip, rise ${fmt(S.lipH)}`:''} · deck height ${fmt(S.legH)} · eyelets ${fmt(S.eyelet)}`);
+  L.push(`Deck tube ${tubeName('deck')} CLR ${fmt(S.deck.clr)} · legs ${tubeName('leg')} CLR ${fmt(S.leg.clr)} · slats ${tubeName('slat')} · overbend ${S.overbend}°`);
+  const list=m.parts.filter(p=>p.sheet).concat(m.custom?[m.custom]:[]);
+  list.forEach(p=>{ L.push(''); L.push(`${p.name.toUpperCase()} — cut ${fmt(p.geo.total)} (${dec(p.geo.total)})`);
+    let bi=0; p.geo.rows.filter(r=>r.type==='bend').forEach(r=>{ bi++; L.push(`  Bend ${bi}  ${r.a.toFixed(1)}°  rot ${r.rot.toFixed(0)}°   start ${fmt(r.start)}   end ${fmt(r.end)}   (from B: ${fmt(p.geo.total-r.start)})${S.offset?`   bender mark ${fmt(r.start-S.offset)}`:''}`); }); });
+  L.push(''); L.push('CUT LIST');
+  m.parts.concat(m.custom?[m.custom]:[]).forEach(p=>L.push(`  ${p.count||1} × ${fmt(p.cut)}  ${p.name}  ${tubeName(p.tube)}  ${p.prep||''}`));
+  L.push(''); L.push(`Total ${fmt(m.totalLen)} tube, about ${wt(m.weight)} per rack`);
+  return L.join('\n');
+}
+
+/* ---------- inputs ---------- */
+function fillSelects(){ document.querySelectorAll('select[data-tube]').forEach(sel=>{ sel.innerHTML=PRESETS.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join(''); }); }
+function setInputs(){
+  document.querySelectorAll('[data-bind]').forEach(el=>{ const v=get(el.dataset.bind), k=el.dataset.kind;
+    if(k==='bool') el.checked=!!v; else if(k==='len') el.value=dispInput(v); else el.value=v; });
+  document.querySelectorAll('select[data-tube]').forEach(sel=>{ const k=sel.dataset.tube; sel.value=S[k].tube; $(k+'-od').disabled=$(k+'-wall').disabled=(S[k].tube!=='custom'); });
+  $('unit-in').setAttribute('aria-pressed',S.unit==='in'); $('unit-mm').setAttribute('aria-pressed',S.unit==='mm');
+  $('f-overlap').hidden=S.legTop!=='bent';
+  $('f-stayPos').hidden=S.stayMode!=='sides'; $('f-staySpacing').hidden=S.stayMode!=='sides';
+  $('f-stayFx').hidden=S.stayMode==='none'; $('f-stayDrop').hidden=S.stayMode==='none';
+  $('custom-wrap').hidden=!S.customOn;
+  renderCustomRows();
+}
+function renderCustomRows(){
+  const tb=$('custom-table').querySelector('tbody');
+  tb.innerHTML=S.custom.map((r,i)=>{ const last=i===S.custom.length-1;
+    return `<tr><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">${i+1}</td>
+      <td><input type="number" step="any" min="0" data-ci="${i}" data-k="s" value="${dispInput(r.s)}" aria-label="Straight ${i+1}"></td>
+      <td><input type="number" step="any" min="0" max="180" data-ci="${i}" data-k="a" value="${last?'':r.a}" ${last?'disabled placeholder="end"':''} aria-label="Bend ${i+1} angle"></td>
+      <td><input type="number" step="any" data-ci="${i}" data-k="rot" value="${last?'':r.rot}" ${last||i===0?'disabled':''} ${i===0&&!last?'placeholder="0"':''} aria-label="Bend ${i+1} rotation"></td>
+      <td><button type="button" class="rm" data-rm-seg="${i}" aria-label="Remove segment ${i+1}" ${S.custom.length<=1?'disabled':''}>×</button></td></tr>`; }).join('');
+}
+function clrHint(id,k){ const t=S[k], r=t.clr/t.od, el=$(id); el.textContent=`${r.toFixed(1)}× OD. Hand benders for this size usually run ${fmt(PRESETS.find(p=>p.id===t.tube)?.clr||t.clr)} CLR.`; el.className='hint'+(r<1.5?' bad':r<2?' warn':''); }
+
+function update(){
+  const m=build();
+  renderAlerts(m); renderStats(m); renderDrawing(m); renderSheets(m); renderCut(m);
+  clrHint('deck-clr-hint','deck'); clrHint('leg-clr-hint','leg');
+  window.__sheet=sheetText(m); save();
+}
+
+document.querySelectorAll('[data-bind]').forEach(el=>{
+  const path=el.dataset.bind, k=el.dataset.kind;
+  const ev=(k==='str'||k==='bool')?'change':'input';
+  el.addEventListener(ev,()=>{
+    if(k==='bool') set(path,el.checked);
+    else if(k==='str') set(path,el.value);
+    else { const v=parseFloat(el.value); if(!isFinite(v)) return; set(path,k==='len'?fromDisp(v):k==='int'?Math.round(v):v); }
+    if(k==='str'||k==='bool') setInputs();
+    update();
+  });
+});
+document.querySelectorAll('select[data-tube]').forEach(sel=>sel.addEventListener('change',()=>{ const k=sel.dataset.tube, p=PRESETS.find(p=>p.id===sel.value); S[k].tube=sel.value; if(sel.value!=='custom'){S[k].od=p.od;S[k].wall=p.wall;} if(S[k].clr!==undefined) S[k].clr=p.clr; setInputs(); update(); }));
+$('preset').addEventListener('change',e=>{ const p=RACK_PRESETS[e.target.value]; if(p){ Object.assign(S,JSON.parse(JSON.stringify(p))); setInputs(); update(); } });
+$('unit-in').addEventListener('click',()=>{S.unit='in';setInputs();update();});
+$('unit-mm').addEventListener('click',()=>{S.unit='mm';setInputs();update();});
+$('add-seg').addEventListener('click',()=>{ const last=S.custom[S.custom.length-1]; last.a=last.a||90; S.custom.push({s:6,a:0,rot:0}); renderCustomRows(); update(); });
+$('custom-table').addEventListener('input',e=>{ const t=e.target, i=+t.dataset.ci, k=t.dataset.k; if(!(i>=0))return; const v=parseFloat(t.value); if(!isFinite(v)) return; S.custom[i][k]=k==='s'?fromDisp(v):v; update(); });
+$('custom-table').addEventListener('click',e=>{ const b=e.target.closest('[data-rm-seg]'); if(!b)return; S.custom.splice(+b.dataset.rmSeg,1); if(S.custom.length) S.custom[S.custom.length-1].a=0; renderCustomRows(); update(); });
+$('copy').addEventListener('click',()=>{
+  const btn=$('copy'), txt=window.__sheet||'';
+  const done=()=>{btn.textContent='Copied';setTimeout(()=>btn.textContent='Copy sheet as text',1500);};
+  const fallback=()=>{ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');done();}catch(e){btn.textContent='Select and copy manually';} setTimeout(()=>ta.remove(),100); };
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else fallback();
+});
+
+fillSelects(); setInputs(); update();
+})();
+</script>
+</body>
+</html>
