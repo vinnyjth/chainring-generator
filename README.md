@@ -171,6 +171,10 @@ before each bend. The cut list includes every piece with end prep (coped tip-to-
 flattened eyelet tabs) and a weight in grams. Units toggle between inches (to 1/32) and mm;
 inputs persist in `localStorage`.
 
+**Designs** can be saved by name in the browser (`localStorage`), loaded back, deleted, and
+exported to a `*.rack.json` file (`{app, version, name, savedAt, state}`) that imports on any
+machine. Import accepts either that wrapper or a bare state object.
+
 Conventions: end A of the deck loop is the open end of the left side rail (the front end when
 the loop is closed at the rear); leg and stay positions are measured back from the front of the
 deck; front is to the right in both views; rotation is read clockwise looking down the tube

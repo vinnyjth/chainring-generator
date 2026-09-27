@@ -68,6 +68,11 @@ table.mini{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
 table.mini th{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-size:12px;color:var(--muted);text-align:left;padding:2px 4px}
 table.mini td{padding:3px 4px;vertical-align:middle}
 table.mini input,table.mini select{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:5px 6px;font-family:var(--mono);font-size:13px}
+.btnrow{display:flex;gap:6px;margin-top:8px}
+.btnrow .sm{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:6px 8px;cursor:pointer;font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+.btnrow .sm:hover{border-color:var(--ink)}
+.btnrow .sm.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.field input[type="text"]{font-family:var(--body)}
 .rm{background:transparent;border:1px solid var(--line);border-radius:4px;width:28px;height:28px;cursor:pointer;color:var(--muted);line-height:1}
 .rm:hover{color:var(--bad);border-color:var(--bad)}
 .add{margin-top:8px;background:transparent;border:1.5px dashed var(--line);border-radius:4px;padding:6px 10px;width:100%;cursor:pointer;color:var(--muted);font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
@@ -148,6 +153,23 @@ table.sheet tfoot td{font-weight:600;border-top:1.5px solid var(--ink);border-bo
         <h2><span class="n">0</span> Start from</h2>
         <div class="field"><label for="preset">Rack type <small>fills in typical dimensions</small></label>
           <select id="preset"><option value="">Keep my numbers</option><option value="rear">Rear pannier rack</option><option value="porteur">Front porteur rack</option><option value="rando">Front rando rack</option></select></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="n">&#9776;</span> Designs</h2>
+        <div class="field"><label for="design-list">Saved in this browser</label><select id="design-list"></select></div>
+        <div class="field"><label for="design-name">Name</label><input type="text" id="design-name" placeholder="Rear rack v2"></div>
+        <div class="btnrow">
+          <button type="button" class="sm primary" id="design-save">Save</button>
+          <button type="button" class="sm" id="design-load">Load</button>
+          <button type="button" class="sm" id="design-delete">Delete</button>
+        </div>
+        <div class="btnrow">
+          <button type="button" class="sm" id="design-export">Export JSON</button>
+          <button type="button" class="sm" id="design-import">Import JSON</button>
+          <input type="file" id="design-file" accept="application/json,.json" hidden>
+        </div>
+        <p class="hint" id="design-status">Saves live in this browser only. Export a JSON file to keep a design or move it to another machine.</p>
       </section>
 
       <section class="card">
@@ -718,7 +740,67 @@ $('copy').addEventListener('click',()=>{
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else fallback();
 });
 
-fillSelects(); setInputs(); update();
+/* ---------- saved designs ---------- */
+const DKEY='brb3-designs';
+function loadDesigns(){ try{ const d=JSON.parse(localStorage.getItem(DKEY)||'{}'); return d&&typeof d==='object'?d:{}; }catch(e){ return {}; } }
+function storeDesigns(d){ try{ localStorage.setItem(DKEY,JSON.stringify(d)); return true; }catch(e){ return false; } }
+function status(msg,bad){ const el=$('design-status'); el.textContent=msg; el.className='hint'+(bad?' bad':''); }
+function applyState(obj){
+  if(!obj||typeof obj!=='object'||!obj.deck) throw new Error('not a rack design');
+  S=Object.assign(JSON.parse(JSON.stringify(DEFAULTS)),obj);
+  ['deck','leg','slat'].forEach(k=>S[k]=Object.assign({},DEFAULTS[k],obj[k]||{}));
+  if(!['u-rear','u-front','closed'].includes(S.style)) S.style='u-rear';
+  if(!Array.isArray(S.custom)||!S.custom.length) S.custom=JSON.parse(JSON.stringify(DEFAULTS.custom));
+  if(!Array.isArray(S.cross)) delete S.cross;
+  setInputs(); update();
+}
+function renderDesignList(selected){
+  const d=loadDesigns(), names=Object.keys(d).sort((a,b)=>(d[b].savedAt||'').localeCompare(d[a].savedAt||''));
+  const sel=$('design-list');
+  sel.innerHTML = names.length ? names.map(n=>`<option value="${esc(n)}">${esc(n)} · ${(d[n].savedAt||'').slice(0,10)}</option>`).join('') : '<option value="">No saved designs yet</option>';
+  if(selected&&d[selected]) sel.value=selected;
+  if(sel.value) $('design-name').value=sel.value;
+}
+function designName(){ return ($('design-name').value||'').trim() || `Rack ${new Date().toISOString().slice(0,10)}`; }
+function safeFile(n){ return n.replace(/[^\w.-]+/g,'-').replace(/^-+|-+$/g,'')||'rack'; }
+$('design-list').addEventListener('change',()=>{ if($('design-list').value) $('design-name').value=$('design-list').value; });
+$('design-save').addEventListener('click',()=>{
+  const n=designName(), d=loadDesigns();
+  d[n]={savedAt:new Date().toISOString(),state:JSON.parse(JSON.stringify(S))};
+  if(storeDesigns(d)){ renderDesignList(n); status(`Saved "${n}".`); } else status('Could not save. This browser is blocking site storage.',true);
+});
+$('design-load').addEventListener('click',()=>{
+  const n=$('design-list').value, d=loadDesigns();
+  if(!n||!d[n]){ status('Pick a saved design first.',true); return; }
+  try{ applyState(d[n].state); $('design-name').value=n; status(`Loaded "${n}".`); }catch(e){ status(`Could not load "${n}": ${e.message}.`,true); }
+});
+$('design-delete').addEventListener('click',()=>{
+  const n=$('design-list').value, d=loadDesigns();
+  if(!n||!d[n]){ status('Pick a saved design first.',true); return; }
+  const btn=$('design-delete');
+  if(btn.dataset.arm!==n){ btn.dataset.arm=n; btn.textContent='Sure?'; status(`Click Delete again to remove "${n}".`); setTimeout(()=>{btn.dataset.arm='';btn.textContent='Delete';},4000); return; }
+  delete d[n]; storeDesigns(d); btn.dataset.arm=''; btn.textContent='Delete'; renderDesignList(); status(`Deleted "${n}".`);
+});
+$('design-export').addEventListener('click',()=>{
+  const n=designName();
+  const payload={app:'bike-rack-bender',version:1,name:n,savedAt:new Date().toISOString(),state:S};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=safeFile(n)+'.rack.json'; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  status(`Exported ${a.download}.`);
+});
+$('design-import').addEventListener('click',()=>$('design-file').click());
+$('design-file').addEventListener('change',e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ const obj=JSON.parse(r.result); const st=obj&&obj.state?obj.state:obj; applyState(st);
+      const n=(obj&&obj.name)||f.name.replace(/\.rack\.json$|\.json$/i,''); $('design-name').value=n; status(`Imported "${n}". Click Save to keep it in this browser.`); }
+    catch(err){ status(`Could not import ${f.name}: ${err.message}.`,true); } finally{ e.target.value=''; } };
+  r.onerror=()=>status(`Could not read ${f.name}.`,true);
+  r.readAsText(f);
+});
+
+fillSelects(); setInputs(); update(); renderDesignList();
 })();
 </script>
 </body>
